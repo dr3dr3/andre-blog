@@ -1,0 +1,81 @@
+---
+title: 'The six-agent pipeline that became two'
+summary: 'A fictional docs pipeline, written to exercise the template. Every number and date in it is invented. Delete this file.'
+published: 2026-06-18
+archetype: 'war-story'
+context: 'a fictional two-person team maintaining an internal documentation site'
+stack:
+    - name: 'Astro'
+      version: '7.2.0'
+    - name: 'Node'
+      version: '24.19.0'
+    - name: 'pnpm'
+      version: '11.20.0'
+outcome:
+    status: 'shipped'
+    was: 'experiment'
+    changed: 2026-07-02
+tags: ['agents', 'placeholder']
+draft: false
+---
+
+import Artefact from '../../components/Artefact.astro';
+
+<div class="placeholder">
+    **Placeholder content — delete this file.** This post describes a fictional team and a fictional
+    pipeline. The stack versions are the ones this repository actually uses; everything else,
+    including all dates, durations and log output, is invented to exercise the metadata block, the
+    changed-outcome treatment, the versioned stack tags and the Artefact component. It is not a
+    record of anything that happened, and it is not written in André's voice. It also runs well
+    short of the 1,800–2,800 words a war story is meant to be — padding fiction to length would only
+    make it easier to mistake for something real.
+
+    To remove it: delete this file. Nothing else references it.
+</div>
+
+The first version had six agents. A planner, a researcher, a writer, a reviewer, a formatter and a
+publisher, chained end to end, rewriting an internal documentation site on every merge to the default
+branch. It worked on the third try and then never worked twice in a row.
+
+The failure was never the same twice, which is the part that cost the most time. Some runs the
+reviewer would object to the writer's output, the writer would revise, and the reviewer would object
+to the revision on different grounds. Some runs the formatter would receive a page that had been
+rewritten so many times the original headings were gone. There was no termination condition anywhere
+in the chain — each agent handed off to the next and the loop between writer and reviewer had no cap.
+
+<Artefact caption="Illustrative — invented output showing the shape of the failure, not a real log.">
+{`14:02:11  planner    → 41 pages queued
+14:02:19  researcher → 41 pages, 0 skipped
+14:06:44  writer     → 41 drafts
+14:07:02  reviewer   → 38 objections
+14:09:30  writer     → 38 revisions
+14:09:51  reviewer   → 33 objections
+14:12:18  writer     → 33 revisions
+14:12:40  reviewer   → 35 objections
+...
+14:51:07  reviewer   → 31 objections
+14:51:07  ERROR      run cancelled at wall-clock limit`}
+</Artefact>
+
+The first fix was to make the reviewer better. More context, a longer rubric, examples of acceptable
+output. This made the objections more specific and the loop longer. The second fix was to add a
+seventh agent to arbitrate between the writer and the reviewer, which is the point at which the
+approach should have been abandoned and was not.
+
+What actually worked was deleting four of them. The planner and the researcher collapsed into one
+step that produced a list of pages and the facts each page needed. The writer stayed. The reviewer
+stayed but was restricted to returning objections as a structured list — it could no longer rewrite
+anything, which removed the drift that had been making each round diverge from the last. The
+formatter became a lint rule. The publisher became a build step.
+
+The cap was the other half of it: two rounds of objections, then the draft goes to a human whether or
+not the objections are resolved. Unresolved objections turn out to be cheap to read and expensive to
+argue with.
+
+The cost was that the output got less polished. The six-agent version, on the runs where it
+terminated, produced pages that needed no edits. The two-agent version produces pages that need
+about one edit each. That is a worse per-page result and a better pipeline, because it finishes.
+
+What would be done differently: the termination condition would go in first, before any of the
+agents. It was added last, as a fix, and by then three of the six agents existed only to manage
+problems the missing cap had created.
