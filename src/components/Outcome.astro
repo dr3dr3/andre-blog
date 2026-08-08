@@ -1,0 +1,32 @@
+---
+import { isoDate, longDate } from '../lib/format';
+
+type Status = 'shipped' | 'abandoned' | 'still-running' | 'experiment';
+
+interface Props {
+    status: Status;
+    /** The previous status, when this post's outcome has since changed. */
+    was?: Status;
+    /** The date it changed. The schema requires this whenever `was` is set. */
+    changed?: Date;
+}
+
+const { status, was, changed } = Astro.props;
+---
+
+{
+    was && (
+        <>
+            <s class="outcome-was">{was}</s>{' '}
+        </>
+    )
+}<span class:list={['outcome', `outcome-${status}`]}>{status}</span>{
+    changed && was && (
+        <>
+            {' '}
+            <time class="outcome-changed" datetime={isoDate(changed)}>
+                {longDate(changed)}
+            </time>
+        </>
+    )
+}

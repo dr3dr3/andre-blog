@@ -32,3 +32,32 @@ dist/
 build/
 coverage/
 *.log
+
+# Astro
+.astro/
+
+# Vercel
+.vercel/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+
+# pnpm keeps its content-addressable store on the same volume as node_modules;
+# in the devcontainer /workspace is a separate mount, so the store lands here.
+.pnpm-store/
+
+# Scaffolding handover note — delete when the scaffold is done.
+HANDOVER.md
+
+# Brain-dumps: raw material from André, containing company names, internal
+# detail and unscrubbed artefacts. Never committed. See docs/WRITING.md §8.
+drafts/*
+!drafts/README.md
+
+# Terraform partial backend config: holds an account-specific bucket name.
+backend.hcl

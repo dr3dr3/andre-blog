@@ -1,0 +1,4 @@
+# pnpm 11 reads settings from here rather than the "pnpm" key in package.json.
+# esbuild ships a platform binary via a postinstall script; Astro's build needs it.
+allowBuilds:
+  esbuild: true

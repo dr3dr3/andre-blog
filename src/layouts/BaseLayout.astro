@@ -1,0 +1,64 @@
+---
+import SiteFooter from '../components/SiteFooter.astro';
+import Analytics from '../components/Analytics.astro';
+import '../styles/global.css';
+
+interface Props {
+    /** Page title, used verbatim in <title> and og:title. */
+    title: string;
+    /** Meta description. Keep it to one sentence. */
+    description: string;
+    /** Set when the post declares a `canonical` in frontmatter. */
+    canonical?: string;
+}
+
+const { title, description, canonical } = Astro.props;
+const url = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en-AU">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={url} />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link
+            rel="preload"
+            href="/fonts/jetbrains-mono-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin
+        />
+        <link
+            rel="preload"
+            href="/fonts/newsreader-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin
+        />
+        <link rel="alternate" type="application/rss+xml" title="André Dreyer" href="/rss.xml" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={url} />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <header class="site-header">
+            <a class="site-name" href="/">André Dreyer</a>
+            <nav aria-label="Primary">
+                <a href="/">Posts</a>
+                <a href="/about">About</a>
+                <a href="/rss.xml">RSS</a>
+            </nav>
+        </header>
+        <main id="main">
+            <slot />
+        </main>
+        <SiteFooter />
+        <Analytics />
+    </body>
+</html>

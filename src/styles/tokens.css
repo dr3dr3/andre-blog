@@ -1,0 +1,51 @@
+/*
+ * Colour, type and spacing tokens. Nothing else in the stylesheet may use a
+ * literal colour — if a value is needed twice it belongs here.
+ *
+ * Recorded in docs/DESIGN.md. The light palette is fixed; the dark palette is a
+ * different material rather than an inversion, so its values are chosen against
+ * a slate ground rather than derived from the light ones.
+ */
+
+:root {
+    /* Light — the specified palette, unchanged. */
+    --ink: #17191c;
+    --paper: #f5f5f2;
+    --rule: #d8dad5;
+    --muted: #6b6f6a;
+    --faint: #9a9e98;
+    --signal: #2f5d50; /* eucalyptus — links and positive outcomes */
+    --amber: #8c5a2b; /* abandoned outcomes only */
+    --wash: #eaece7; /* artefact blocks */
+
+    /* Type */
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+
+    --fs-body: 1.0625rem; /* 17px, lifted to 18px at wider viewports */
+    --fs-utility: 0.71875rem; /* 11.5px — metadata, dates, tags, footer */
+    --fs-index-title: 1.25rem; /* 20px */
+    --fs-post-title: 1.625rem; /* 26px */
+    --lh-body: 1.7;
+
+    /* Layout */
+    --measure: 62ch;
+    --gutter: 1.5rem;
+    --label-col: 74px; /* metadata block label column */
+    --radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* A deep cool slate ground, warm off-white ink, eucalyptus raised in
+         * luminance so it still reads as a link rather than as body text. */
+        --ink: #e9e4db;
+        --paper: #15181b;
+        --rule: #2a2f33;
+        --muted: #8f968f;
+        --faint: #5f6663;
+        --signal: #79b39c;
+        --amber: #c68b52;
+        --wash: #1c2024;
+    }
+}

@@ -1,0 +1,15 @@
+---
+import { getDora } from '../lib/dora';
+
+// Computed from git history at build time. An em dash means the number is not
+// available, not that it is zero. See src/lib/dora.ts.
+const dora = getDora();
+---
+
+<footer class="site-footer">
+    <p>
+        deploy freq {dora.deployFrequency} · lead time {dora.leadTime} · change fail {
+            dora.changeFailureRate
+        } · mttr {dora.timeToRestore}
+    </p>
+</footer>

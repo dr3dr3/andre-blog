@@ -11,7 +11,7 @@ set -euo pipefail
 USER_NAME="$(id -un)"
 USER_GROUP="$(id -gn)"
 
-for dir in "${HOME}/.claude" "${HOME}/.aws" /commandhistory; do
+for dir in "${HOME}/.claude" "${HOME}/.aws" "${HOME}/.pnpm-store" /commandhistory /workspace/node_modules; do
     if [ -d "$dir" ] && [ ! -w "$dir" ]; then
         sudo chown -R "${USER_NAME}:${USER_GROUP}" "$dir"
     fi

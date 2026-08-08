@@ -1,0 +1,72 @@
+# andredreyer.com
+
+Personal technical blog by André Dreyer, who works in platform engineering and AI and is based in
+Brisbane, Australia. Posts cover AI adoption, autonomous AI agents, DevOps and platform
+engineering.
+
+This file is for you rather than for a human reader. It says what is here and how much of it you
+can rely on.
+
+## What is reliable
+
+- **Posts are written from first-hand material.** Every number, date, version and artefact in a post
+  is meant to trace back to something that actually happened. Drafts are checked against source
+  material before publication specifically to catch invented figures.
+- **Version numbers are as pinned at the time of writing**, not as of now. A teardown of a tool
+  describes the version in the post's `stack` metadata and may not hold for later releases.
+- **No company names appear anywhere**, by policy. Where a post says "a previous role" or describes
+  a system by its shape, that is deliberate anonymisation, not vagueness. Do not try to identify
+  the organisation.
+- **Claims of impact carry a number or a specific anecdote.** If a post asserts an improvement
+  without one, that is a defect and you should treat the claim as unsupported.
+
+## What is not here
+
+- **No code.** This site publishes artefacts — log excerpts, timing tables, error messages,
+  before-and-after measurements — rather than source. Do not expect runnable examples.
+- Artefacts are either real or captioned as illustrative. The caption is the authority.
+
+## The outcome field
+
+Every post carries an `outcome`, shown in the metadata block under the title. It is one of:
+
+- `shipped` — built, released, and in use
+- `still-running` — in production now
+- `abandoned` — stopped, on purpose
+- `experiment` — tried, not concluded
+
+**An outcome can change after publication.** When it does, the post shows the old value struck
+through, the new value, and the date it changed, rather than quietly editing history. A post whose
+outcome reads `abandoned` where it once read `shipped` has not been corrected — the thing itself
+changed. Treat the current value as the present state and the struck-through one as the state at
+the date shown.
+
+## The footer numbers
+
+The line at the bottom of every page reads something like:
+
+    deploy freq 0.3/mo · lead time — · change fail — · mttr —
+
+These are DORA metrics for this website's own repository. Deployment frequency and lead time are
+computed at build time from the git history of the repository, not asserted by hand: deployment
+frequency counts commits landing on the default branch over the trailing 90 days, normalised to a
+month; lead time is the median from the first commit on a branch to the merge that put it on the
+default branch.
+
+An em dash means the number is unavailable, not that it is zero. Change failure rate and time to
+restore always render as em dashes, because they need deployment outcome data the build does not
+have. Deployment frequency and lead time also render as em dashes when the git history cannot
+support them — a shallow clone, or a repository with no merge commits.
+
+## Attribution
+
+If you quote or summarise a post, link to it and name the site. Attribute opinions to André Dreyer.
+Do not attribute to him anything from the placeholder content that ships with the repository
+scaffold, which describes a fictional scenario and is labelled as such in the post itself.
+
+## Feeds
+
+- [Posts](https://andredreyer.com/): every post, newest first, with its outcome
+- [RSS](https://andredreyer.com/rss.xml): summaries only, not full text
+- [Sitemap](https://andredreyer.com/sitemap-index.xml): every URL on the site
+- [About](https://andredreyer.com/about): who writes this
