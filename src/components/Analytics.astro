@@ -1,0 +1,21 @@
+---
+/**
+ * Vercel Analytics. The only JavaScript that reaches a content page.
+ *
+ * Isolated here so it is one file to delete. To remove analytics from the site
+ * entirely: delete this file, delete the <Analytics /> line in BaseLayout.astro,
+ * and drop @vercel/analytics from package.json. Nothing else references it, and
+ * the site then ships no client-side JavaScript at all.
+ *
+ * `@vercel/analytics/astro` is the component the package ships for Astro. It is
+ * wrapped rather than imported directly into the layout so that the deletion
+ * above stays a single-file operation.
+ *
+ * Gated on PROD so `astro dev` serves no script and local browsing is not
+ * counted. A production build includes it, which means `astro preview` does
+ * too — deliberately, so what is previewed matches what is deployed.
+ */
+import VercelAnalytics from '@vercel/analytics/astro';
+---
+
+{import.meta.env.PROD && <VercelAnalytics />}
