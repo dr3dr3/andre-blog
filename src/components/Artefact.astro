@@ -1,0 +1,13 @@
+---
+interface Props {
+    /** Optional caption, rendered below the block. Says what this is and where it came from. */
+    caption?: string;
+}
+
+const { caption } = Astro.props;
+---
+
+<figure class="artefact">
+    <pre><slot /></pre>
+    {caption && <figcaption>{caption}</figcaption>}
+</figure>

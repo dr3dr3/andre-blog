@@ -1,0 +1,40 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostMeta from '../../components/PostMeta.astro';
+import { getPosts, type Post } from '../../lib/posts';
+import { readingMinutes } from '../../lib/format';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+    const posts = await getPosts();
+    return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+};
+
+interface Props {
+    post: Post;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const minutes = readingMinutes(post.body ?? '');
+---
+
+<BaseLayout title={post.data.title} description={post.data.summary} canonical={post.data.canonical}>
+    <article>
+        <h1>{post.data.title}</h1>
+        <PostMeta data={post.data} minutes={minutes} />
+        <div class="prose">
+            <Content />
+        </div>
+        {
+            post.data.tags.length > 0 && (
+                <p class="post-tags">
+                    {post.data.tags.map((tag) => (
+                        <a href={`/tags/${tag}/`}>{tag}</a>
+                    ))}
+                </p>
+            )
+        }
+    </article>
+</BaseLayout>

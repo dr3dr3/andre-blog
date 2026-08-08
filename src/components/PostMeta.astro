@@ -1,0 +1,62 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Outcome from './Outcome.astro';
+import { isoDate, longDate } from '../lib/format';
+
+interface Props {
+    data: CollectionEntry<'posts'>['data'];
+    /** Estimated reading time in whole minutes. */
+    minutes: number;
+}
+
+const { data, minutes } = Astro.props;
+---
+
+<dl class="post-meta">
+    {
+        data.context && (
+            <>
+                <dt>context</dt>
+                <dd>{data.context}</dd>
+            </>
+        )
+    }
+    {
+        data.stack.length > 0 && (
+            <>
+                <dt>stack</dt>
+                <dd>
+                    {data.stack.map((item, i) => (
+                        <>
+                            {i > 0 && <span class="sep"> · </span>}
+                            {item.version ? (
+                                <abbr title={`${item.name} ${item.version}`} tabindex="0">
+                                    {item.name}
+                                </abbr>
+                            ) : (
+                                <span>{item.name}</span>
+                            )}
+                        </>
+                    ))}
+                </dd>
+            </>
+        )
+    }
+    <dt>outcome</dt>
+    <dd>
+        <Outcome status={data.outcome.status} was={data.outcome.was} changed={data.outcome.changed} />
+    </dd>
+    <dt>published</dt>
+    <dd>
+        <time datetime={isoDate(data.published)}>{isoDate(data.published)}</time>
+        <span class="sep"> · </span>{minutes} min
+        {
+            data.updated && (
+                <>
+                    <span class="sep"> · </span>updated{' '}
+                    <time datetime={isoDate(data.updated)}>{longDate(data.updated)}</time>
+                </>
+            )
+        }
+    </dd>
+</dl>

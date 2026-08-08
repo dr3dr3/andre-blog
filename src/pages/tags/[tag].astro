@@ -1,0 +1,45 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Outcome from '../../components/Outcome.astro';
+import { getPosts, getTags, type Post } from '../../lib/posts';
+import { isoDate } from '../../lib/format';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+    const [posts, tags] = await Promise.all([getPosts(), getTags()]);
+    return tags.map((tag) => ({
+        params: { tag },
+        props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)) },
+    }));
+};
+
+interface Props {
+    tag: string;
+    posts: Post[];
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`${tag} — André Dreyer`} description={`Posts tagged ${tag}.`}>
+    <h1>{tag}</h1>
+    <ul class="post-index">
+        {
+            posts.map((post) => (
+                <li>
+                    <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+                    <p class="summary">{post.data.summary}</p>
+                    <p class="index-meta">
+                        <time datetime={isoDate(post.data.published)}>{isoDate(post.data.published)}</time>
+                        <span class="sep"> · </span>
+                        <Outcome
+                            status={post.data.outcome.status}
+                            was={post.data.outcome.was}
+                            changed={post.data.outcome.changed}
+                        />
+                    </p>
+                </li>
+            ))
+        }
+    </ul>
+</BaseLayout>

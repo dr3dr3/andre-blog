@@ -1,0 +1,27 @@
+{
+    "name": "andre-blog",
+    "type": "module",
+    "version": "0.0.1",
+    "private": true,
+    "packageManager": "pnpm@11.20.0",
+    "engines": {
+        "node": ">=22.12.0"
+    },
+    "scripts": {
+        "dev": "ASTRO_DEV_BACKGROUND=1 astro dev --port 4380 --host 0.0.0.0",
+        "build": "astro build",
+        "preview": "astro preview --port 4380 --host 0.0.0.0",
+        "check": "astro check",
+        "astro": "astro"
+    },
+    "dependencies": {
+        "@astrojs/mdx": "^7.0.5",
+        "@astrojs/sitemap": "^3.7.3",
+        "@vercel/analytics": "^2.0.1",
+        "astro": "^7.2.0"
+    },
+    "devDependencies": {
+        "@astrojs/check": "^0.9.10",
+        "typescript": "^6.0.3"
+    }
+}

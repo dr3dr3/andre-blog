@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Outcome from '../components/Outcome.astro';
+import { getPosts } from '../lib/posts';
+import { isoDate } from '../lib/format';
+
+// Reverse-chronological, no pagination. Revisit at 30 posts.
+const posts = await getPosts();
+---
+
+<BaseLayout
+    title="André Dreyer"
+    description="Notes on platform engineering, AI agents and the systems around them."
+>
+    <h1 class="visually-hidden">Posts</h1>
+    <ul class="post-index">
+        {
+            posts.map((post) => (
+                <li>
+                    <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+                    <p class="summary">{post.data.summary}</p>
+                    <p class="index-meta">
+                        <time datetime={isoDate(post.data.published)}>{isoDate(post.data.published)}</time>
+                        <span class="sep"> · </span>
+                        <Outcome
+                            status={post.data.outcome.status}
+                            was={post.data.outcome.was}
+                            changed={post.data.outcome.changed}
+                        />
+                    </p>
+                </li>
+            ))
+        }
+    </ul>
+</BaseLayout>
