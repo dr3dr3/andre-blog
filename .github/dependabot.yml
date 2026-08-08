@@ -1,0 +1,34 @@
+version: 2
+
+# Note: this only covers the GitHub Actions used by CI and the `FROM ubuntu:24.04`
+# base image. The tool versions pinned as ARGs in .devcontainer/Dockerfile
+# (NODE_MAJOR, YQ_VERSION + hashes, AWSCLI_VERSION) are not visible to Dependabot
+# and must be bumped by hand — see the "Updating pinned versions" section of the README.
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: docker
+    directory: "/.devcontainer"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "build"
+    # Staying on 24.04 LTS is a deliberate choice, so distro upgrades are not
+    # wanted as automated PRs (Dependabot proposed 26.04 within minutes of this
+    # config landing). Patches still arrive without Dependabot: `ubuntu:24.04`
+    # is a moving tag that Canonical republishes, and the weekly scheduled build
+    # in devcontainer.yml forces a fresh pull.
+    #
+    # To move to the next LTS, delete this ignore block and Dependabot will
+    # offer it — remember to update the "Supported until" comment and the
+    # `noble` assumptions in the Dockerfile at the same time.
+    ignore:
+      - dependency-name: "ubuntu"
+        update-types:
+          - version-update:semver-major   # 24.04 -> 26.04
+          - version-update:semver-minor   # 24.04 -> 24.10 (interim, not LTS)
