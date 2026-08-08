@@ -1,0 +1,458 @@
+@import './tokens.css';
+
+/* ---------------------------------------------------------------------------
+ * Fonts. Self-hosted, latin + latin-ext subsets pulled from the Google Fonts
+ * CDN once and committed. Nothing is fetched from a third party at runtime.
+ * Both files are variable; the weight range is declared so the browser
+ * interpolates rather than synthesising.
+ * ------------------------------------------------------------------------ */
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+        U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/jetbrains-mono-latin-ext.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+        U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+        U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: 'Newsreader';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/newsreader-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+        U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Newsreader';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/newsreader-latin-ext.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+        U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+        U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------------------------------------------------------------------------
+ * Reset
+ * ------------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+li,
+dl,
+dt,
+dd,
+figure,
+blockquote,
+pre {
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    list-style: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * Page frame — one column, left-aligned, centred, generous top margin.
+ * ------------------------------------------------------------------------ */
+
+html {
+    background: var(--paper);
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: var(--fs-body);
+    font-optical-sizing: auto;
+    line-height: var(--lh-body);
+    padding: 0 var(--gutter) 4rem;
+}
+
+@media (min-width: 40rem) {
+    body {
+        font-size: 1.125rem;
+    }
+}
+
+.site-header,
+main,
+.site-footer {
+    max-width: var(--measure);
+    margin-inline: auto;
+}
+
+a {
+    color: var(--signal);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+}
+
+:focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+.skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    background: var(--paper);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--rule);
+}
+
+.skip:focus {
+    left: var(--gutter);
+    top: 0.5rem;
+    z-index: 1;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+ * Header and footer
+ * ------------------------------------------------------------------------ */
+
+.site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 4.5rem 0 0.75rem;
+    border-bottom: 1px solid var(--rule);
+}
+
+.site-name {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.site-header nav {
+    display: flex;
+    gap: 1rem;
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+}
+
+.site-header nav a {
+    text-decoration: none;
+}
+
+.site-header nav a:hover,
+.site-name:hover {
+    text-decoration: underline;
+}
+
+main {
+    padding-top: 3.5rem;
+}
+
+/* The utility type goes on the inner <p>, not here. `ch` resolves against the
+ * element's own font, so a mono 11.5px footer would compute a much narrower
+ * 62ch than the body-font header and main, and its hairline would not line up. */
+.site-footer {
+    margin-top: 5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--rule);
+}
+
+.site-footer p {
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    line-height: 1.6;
+    color: var(--faint);
+}
+
+/* ---------------------------------------------------------------------------
+ * Index
+ * ------------------------------------------------------------------------ */
+
+.post-index li + li {
+    margin-top: 2.25rem;
+}
+
+.post-index > li > a {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: var(--fs-index-title);
+    letter-spacing: -0.025em;
+    line-height: 1.35;
+    color: var(--ink);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.post-index > li > a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--signal);
+}
+
+.summary {
+    margin-top: 0.4rem;
+    color: var(--muted);
+}
+
+.index-meta {
+    margin-top: 0.45rem;
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+/* ---------------------------------------------------------------------------
+ * Post
+ * ------------------------------------------------------------------------ */
+
+h1 {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: var(--fs-post-title);
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    text-wrap: balance;
+}
+
+.prose h2,
+.prose h3 {
+    font-family: var(--mono);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1.3;
+    margin-top: 2.5rem;
+}
+
+.prose h2 {
+    font-size: 1.0625rem;
+}
+
+.prose h3 {
+    font-size: 0.9375rem;
+    color: var(--muted);
+}
+
+.prose > * + * {
+    margin-top: 1.25rem;
+}
+
+.prose ul,
+.prose ol {
+    padding-left: 1.25rem;
+}
+
+.prose ul {
+    list-style: disc;
+}
+
+.prose ol {
+    list-style: decimal;
+}
+
+.prose li + li {
+    margin-top: 0.4rem;
+}
+
+.prose blockquote {
+    border-left: 1px solid var(--rule);
+    padding-left: 1rem;
+    color: var(--muted);
+}
+
+.prose code {
+    font-family: var(--mono);
+    font-size: 0.875em;
+    background: var(--wash);
+    border-radius: 3px;
+    padding: 0.1em 0.3em;
+}
+
+.prose .placeholder {
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    line-height: 1.6;
+    color: var(--muted);
+    background: var(--wash);
+    border-radius: var(--radius);
+    padding: 0.75rem 0.875rem;
+}
+
+/* The reset zeroes paragraph margins and `.prose > * + *` only reaches direct
+ * children, so paragraphs nested inside the block need their own spacing. */
+.prose .placeholder > * + * {
+    margin-top: 0.75rem;
+}
+
+.post-tags {
+    margin-top: 3rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.875rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Metadata block — hairline top and bottom, label column, values in ink.
+ * ------------------------------------------------------------------------ */
+
+.post-meta {
+    margin-top: 1.25rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: var(--label-col) minmax(0, 1fr);
+    row-gap: 0.25rem;
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    line-height: 1.65;
+}
+
+.post-meta dt {
+    color: var(--muted);
+}
+
+.post-meta dd {
+    color: var(--ink);
+}
+
+.post-meta abbr {
+    text-decoration: underline dotted var(--faint);
+    text-underline-offset: 0.2em;
+    cursor: help;
+}
+
+.sep {
+    color: var(--faint);
+}
+
+/* ---------------------------------------------------------------------------
+ * Outcome — the only place colour carries meaning.
+ * ------------------------------------------------------------------------ */
+
+.outcome-shipped,
+.outcome-still-running {
+    color: var(--signal);
+}
+
+.outcome-abandoned {
+    color: var(--amber);
+}
+
+.outcome-experiment {
+    color: var(--muted);
+}
+
+.outcome-was {
+    color: var(--faint);
+}
+
+.outcome-changed {
+    color: var(--faint);
+}
+
+/* ---------------------------------------------------------------------------
+ * Artefact — what stands in for code blocks. No syntax highlighting anywhere.
+ * ------------------------------------------------------------------------ */
+
+.artefact {
+    margin-top: 1.5rem;
+}
+
+.artefact pre {
+    background: var(--wash);
+    border-radius: var(--radius);
+    padding: 0.875rem 1rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    tab-size: 4;
+}
+
+.artefact figcaption {
+    margin-top: 0.5rem;
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    line-height: 1.5;
+    color: var(--faint);
+}
+
+/* ---------------------------------------------------------------------------
+ * Narrow viewports — the floor is 380px.
+ * ------------------------------------------------------------------------ */
+
+@media (max-width: 26rem) {
+    :root {
+        --gutter: 1.125rem;
+        --label-col: 68px;
+    }
+
+    .site-header {
+        padding-top: 2.5rem;
+    }
+
+    main {
+        padding-top: 2.5rem;
+    }
+}
