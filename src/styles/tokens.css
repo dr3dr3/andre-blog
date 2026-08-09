@@ -8,6 +8,12 @@
  */
 
 :root {
+    /* Declares that both palettes below are supported, which the media query
+     * alone cannot tell the browser. Without it the UA paints its default white
+     * canvas before and around this stylesheet — a visible flash on a dark-mode
+     * device — and renders scrollbars and form controls light regardless. */
+    color-scheme: light dark;
+
     /* Light — the specified palette, unchanged. */
     --ink: #17191c;
     --paper: #f5f5f2;
