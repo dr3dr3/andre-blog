@@ -9,26 +9,38 @@
         // "args": { "NODE_MAJOR": "22" }
     },
 
-    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-    "workspaceFolder": "/workspace",
+    // workspaceMount and workspaceFolder are deliberately NOT set.
+    //
+    // This repo is meant to be opened with "Dev Containers: Clone Repository in
+    // Container Volume", which puts the working tree on a Docker volume — ext4,
+    // native container storage — and mounts it at /workspaces/andre-blog.
+    // Pinning workspaceMount to a bind of ${localWorkspaceFolder} would override
+    // that and force the tree back onto the host filesystem.
+    //
+    // Why it matters: on a Windows host the bind mount is v9fs, where a single
+    // small file read costs ~12ms. Astro's dev server needs ~48s to become ready
+    // there and its file watcher never fires, so it serves stale pages after an
+    // edit. The same tree on ext4 is ready in 1s and watches correctly. Builds
+    // are fine either way; it is only the dev server that suffers.
+    //
+    // Opening this folder as a plain bind mount still works — VS Code falls back
+    // to its default of /workspaces/<folder> — you just get the slow dev server.
+    // See "Local development" in README.md.
 
     // Bind the host Docker socket (docker-outside-of-docker: the CLI in this
     // container drives the host daemon) and persist state that is expensive to
     // recreate. The named volumes are keyed by ${devcontainerId}, so each repo
     // built from this template gets its own credentials and history.
     //
-    // node_modules and the pnpm store are on named volumes rather than inside
-    // the workspace bind mount. /workspace is v9fs when the host is WSL2, where
-    // a single small file read costs ~12ms; Vite's dev server fetches thousands
-    // of modules on first request and times out before it can serve a page.
-    // A Docker volume is native container storage, so those reads are ~40x
-    // faster and `astro dev` starts. See "Local development" in README.md.
+    // There is no node_modules volume: when the working tree is already on a
+    // volume, node_modules is on it too and a separate mount buys nothing. The
+    // pnpm store stays on its own volume because it lives outside the tree, in
+    // $HOME, which is container-local and wiped on rebuild.
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
         "source=devcontainer-${devcontainerId}-claude,target=/home/dev/.claude,type=volume",
         "source=devcontainer-${devcontainerId}-aws,target=/home/dev/.aws,type=volume",
         "source=devcontainer-${devcontainerId}-history,target=/commandhistory,type=volume",
-        "source=devcontainer-${devcontainerId}-node-modules,target=/workspace/node_modules,type=volume",
         "source=devcontainer-${devcontainerId}-pnpm-store,target=/home/dev/.pnpm-store,type=volume"
     ],
 

@@ -11,11 +11,19 @@ set -euo pipefail
 USER_NAME="$(id -un)"
 USER_GROUP="$(id -gn)"
 
-for dir in "${HOME}/.claude" "${HOME}/.aws" "${HOME}/.pnpm-store" /commandhistory /workspace/node_modules; do
+for dir in "${HOME}/.claude" "${HOME}/.aws" "${HOME}/.pnpm-store" /commandhistory; do
     if [ -d "$dir" ] && [ ! -w "$dir" ]; then
         sudo chown -R "${USER_NAME}:${USER_GROUP}" "$dir"
     fi
 done
+
+# pnpm is not baked into the image. Corepack ships with Node and fetches the
+# exact version pinned by `packageManager` in package.json. The shim lives in
+# ~/.local/bin (already on PATH), which is container-local rather than a volume,
+# so it has to be recreated on every rebuild.
+mkdir -p "${HOME}/.local/bin"
+corepack enable --install-directory "${HOME}/.local/bin" pnpm >/dev/null 2>&1 \
+    || echo "post-create: corepack could not install the pnpm shim; run 'corepack enable' by hand"
 
 # Persist bash history to the /commandhistory volume so it survives rebuilds.
 # `history -a` flushes after every command rather than only on clean exit.

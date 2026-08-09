@@ -17,22 +17,34 @@ pnpm preview    # serves dist/
 pnpm check      # astro check
 ```
 
-Requires Node 22.12+ and pnpm (pinned by `packageManager`; `corepack enable` will fetch it).
+Requires Node 22.12+ and pnpm (pinned by `packageManager`; the devcontainer's `post-create.sh`
+installs the corepack shim, or run `corepack enable` yourself).
 
-**In the devcontainer, `node_modules` and the pnpm store are Docker named volumes** rather than
-directories inside the workspace. `/workspace` is a bind mount, and on a WSL2 host that means v9fs,
-where a single small file read costs around 12ms — enough that Astro's type generation took 21
-seconds and Vite's dev server timed out before serving a page. On volumes the same work takes
-milliseconds. The mounts are declared in
-[.devcontainer/devcontainer.json](.devcontainer/devcontainer.json). **After a container rebuild the
-volume is empty, so run `pnpm install` again.**
+### Open this repo in a container volume
 
-**`astro dev` does not work if the repo is cloned onto a Windows drive.** The volumes above fix
-`node_modules`, but the project source is still on v9fs, and there the dev server takes ~48 seconds
-to start and its file watcher never fires — it serves stale pages after an edit. The same project on
-a Linux filesystem starts in 1 second and watches correctly. If you hit this, clone into the WSL2
-Linux filesystem (`~/code/andre-blog` inside the distro) and open that folder instead. Until then,
-`pnpm build && pnpm preview` is the working loop; the build takes about 4 seconds.
+**Use "Dev Containers: Clone Repository in Container Volume" rather than cloning to disk and opening
+the folder.** It puts the working tree on a Docker volume — ext4, native container storage — instead
+of a bind mount of the host filesystem.
+
+This matters on a Windows host, where the bind mount is v9fs and a single small file read costs
+around 12ms. Measured on this project, with everything else identical:
+
+| Working tree on | `astro dev` ready | File watcher |
+| --- | --- | --- |
+| v9fs bind mount (a Windows drive) | 48–53s | never fires — serves stale pages after an edit |
+| ext4 (a container volume) | **1s** | works |
+
+`astro build` is unaffected either way, at about 4 seconds. It is only the dev server that suffers,
+because Vite fetches thousands of modules through its SSR module runner on first request. Disabling
+the watcher does not help, and a polling watcher makes it worse — the server then never becomes
+ready at all. Cloning into the WSL2 Linux filesystem works equally well if you prefer that; the
+requirement is a Linux filesystem, not WSL specifically.
+
+Opening the folder as a plain bind mount still works. You get the slow dev server, and
+`pnpm build && pnpm preview` as the practical loop.
+
+**After any container rebuild, run `pnpm install`** — `node_modules` lives in the tree and the pnpm
+store volume only caches the packages, it does not populate `node_modules` for you.
 
 ## Writing a post
 
