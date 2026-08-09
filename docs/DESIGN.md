@@ -16,8 +16,8 @@ contain a literal colour.
 | `--ink` | `#17191C` | body text, titles, metadata values |
 | `--paper` | `#F5F5F2` | page ground |
 | `--rule` | `#D8DAD5` | hairline separators — the only decoration on the site |
-| `--muted` | `#6B6F6A` | metadata labels, summaries, `experiment` outcomes |
-| `--faint` | `#9A9E98` | superseded outcomes, artefact captions, the DORA footer |
+| `--muted` | `#4D514D` | metadata labels, summaries, `experiment` outcomes |
+| `--faint` | `#6B6F6A` | superseded outcomes, artefact captions, the DORA footer |
 | `--signal` | `#2F5D50` | links, focus rings, `shipped` and `still-running` outcomes |
 | `--amber` | `#8C5A2B` | `abandoned` outcomes only |
 | `--wash` | `#EAECE7` | artefact blocks, inline code |
@@ -33,8 +33,8 @@ eucalyptus raised in luminance so it still reads as a link.
 | `--ink` | `#E9E4DB` |
 | `--paper` | `#15181B` |
 | `--rule` | `#2A2F33` |
-| `--muted` | `#8F968F` |
-| `--faint` | `#5F6663` |
+| `--muted` | `#B3B8B0` |
+| `--faint` | `#8F968F` |
 | `--signal` | `#79B39C` |
 | `--amber` | `#C68B52` |
 | `--wash` | `#1C2024` |
@@ -60,12 +60,20 @@ Single column, left-aligned, centred in the viewport, measure capped at `62ch`. 
 cards, no hero images, no featured post. Header is the name on the left and text links on the
 right, separated by a hairline. Responsive floor is 380px.
 
-## Known open question
+## The tone scale, and why it moved
 
-`--faint` at `#9A9E98` on `--paper` measures **2.49:1**, below the WCAG AA threshold of 4.5:1 for
-body-size text. Any value that clears AA on this ground lands within a hair of `--muted`
-(`#6B6F6A`, 4.68:1), which collapses the two tiers into one. The token is implemented as specified
-and the trade-off is recorded here for the design pass to settle.
+As originally specified, `--faint` was `#9A9E98`, measuring **2.49:1** on `--paper` — well below the
+WCAG AA threshold of 4.5:1, which applies because `--faint` is used at 11.5px, under the large-text
+exemption. Lighthouse flagged it on the footer, the index metadata and both outcome elements.
+
+The awkwardness recorded here previously was real: any value clearing AA on this ground lands within
+a hair of the original `--muted` (`#6B6F6A`, 4.68:1). Fixing `--faint` alone would have collapsed
+two tiers into one.
+
+Resolved on 2026-08-09 by moving both rather than one. `--faint` took the original `--muted` value,
+and `--muted` moved a step further from the ground. Three distinct levels survive, both palettes
+clear AA, and summaries and blockquotes gained readability as a side effect (4.68:1 → 7.40:1).
+`--ink`, `--paper`, `--signal` and `--amber` are untouched from the specified palette.
 
 ## Contrast reference
 
@@ -75,7 +83,7 @@ Measured against the relevant ground. `--rule` and `--wash` are surfaces, not te
 | Token | Light on `--paper` | Dark on `--paper` |
 | --- | --- | --- |
 | `--ink` | 16.13:1 | 14.07:1 |
-| `--muted` | 4.68:1 | ~5.7:1 |
-| `--faint` | 2.49:1 | 3.03:1 |
+| `--muted` | 7.40:1 | 8.83:1 |
+| `--faint` | 4.68:1 | 5.88:1 |
 | `--signal` | 6.86:1 | 7.42:1 |
 | `--amber` | 5.32:1 | 6.12:1 |
