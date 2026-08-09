@@ -1,0 +1,169 @@
+---
+title: 'The release checklist we deleted on purpose'
+summary: 'The release process was a written document until it became five machine checks that refuse. What the refusals cost, and the checks that could never have failed.'
+published: 2026-08-09
+archetype: 'war-story'
+context: 'a six-repository platform — three backends, three browser applications — serving bespoke and made-to-measure tailoring businesses'
+stack:
+    - name: 'GitHub Actions'
+outcome:
+    status: 'still-running'
+tags: ['continuous-delivery', 'release-engineering', 'github-actions']
+draft: true
+---
+
+import Artefact from '../../components/Artefact.astro';
+
+The release process was a document. Six repositories — three backends, three browser applications —
+and the order they had to ship in lived on a page somebody had to remember to open.
+
+## The state of things
+
+The platform serves bespoke and made-to-measure tailoring businesses. Six independent repositories is
+not an unusual shape, and neither is the problem it creates: a change to the API and a change to the
+screen that calls it are often two halves of one improvement. Ship one without the other and you get
+a screen asking for something the backend no longer accepts, or a backend waiting on a screen that
+does not exist yet.
+
+The constraint that shapes everything else is that nothing auto-deploys on a branch push. Merging to
+trunk gathers work; it publishes nothing. Staging is a manual dispatch. Production is a tag cut by a
+workflow. A developer can finish a change, have a colleague review it, merge it, and have nothing at
+all reach a user.
+
+So somebody has to decide what ships together and in what order, and the order is not arbitrary.
+
+| Order | Component            | Why                                                                 |
+| ----- | -------------------- | ------------------------------------------------------------------- |
+| 1     | Identity service     | owns the tenant registry the API's migration sweep reads            |
+| 2     | API                  | the backend contract must exist before a browser application calls it |
+| 3     | Browser applications | independent of each other                                           |
+
+Backend before frontend, always. A screen calling an endpoint that is not deployed yet fails. A
+deployed endpoint nobody calls yet is harmless.
+
+## What went wrong
+
+All of that was written down, and writing it down was the problem.
+
+A documented process does not fail because people disagree with it. It fails because skipping a step
+looks exactly like following one. A check nobody ran leaves nothing behind — no artefact, no
+timestamp, no absence anyone can point at afterwards. The document says the step happened. The
+document says that whether or not it did.
+
+One of those steps was to check, before merging, whether the branch had fallen behind trunk. A green
+check on a branch that is eight commits behind ran against a stale base: it tells you that branch was
+green, not that the merged result is. A conflict-free merge is not a correctness signal.
+
+We had a clean automatic merge produce a duplicated variable declaration that broke all 166 tests in
+a suite, with the pull request reporting itself mergeable throughout. Two branches had independently
+implemented the same change at slightly different offsets; the merge tool saw two unrelated additions
+and kept both.
+
+[[TK: in the 166-test case, was the stale-base step skipped, or did the checklist not have it yet?]]
+
+[[TK: how was that break noticed, and how long after the merge? CI, a person, or a user?]]
+
+[[TK: is there a worse instance than the 166-test one — something that reached production because a
+written step was skipped? That would be a stronger example if it exists.]]
+
+## What I tried first
+
+[[TK: this section is the post. How many versions of the written process were there before the
+checks moved into the pipeline, and over what period?]]
+
+[[TK: what was each attempt, in the order it happened? A page in the wiki, a pull request template, a
+runbook, a checklist in the PR description, an AI-assistant instruction file — which of these, and in
+what order?]]
+
+[[TK: what was the reasoning at the time for each one? Not the hindsight reasoning — what made it
+look like the right next move when it was made?]]
+
+[[TK: what did each attempt cost? Time to write, time to maintain, or a specific incident it failed
+to prevent.]]
+
+[[TK: did any of them make things worse? A longer document that got read less, or a checklist so
+detailed people started copy-pasting the ticks?]]
+
+[[TK: what was the moment it became clear that documenting it harder was not going to work?]]
+
+## What actually worked, and what it cost
+
+The rules stopped being written down and started being enforced. Asking to release runs one workflow,
+and that workflow refuses on five things:
+
+1. the commit is on trunk
+2. trunk's head, the `staging` tag and the commit being shipped are all the same object
+3. the staging deploy for that commit finished green — not still rolling out
+4. the range carries no unapplied database migrations, per that repository's policy
+5. the releaser has said in writing what is shipping and why
+
+The second check is the one doing the most work, and it depends on a detail that is easy to miss.
+Every staging deploy force-moves a movable `staging` tag onto the deployed commit, so that tag is an
+honest record of what is actually on staging rather than an assertion that something was promoted.
+The release does not trust the equality; it checks it.
+
+A refusal happens before anything is cut. No tag, no deploy, `staging` untouched, nothing to unwind.
+It costs about ninety seconds: read what it says, fix the one thing, ask again. There is no override
+for being in a hurry.
+
+<Artefact caption="[[TK: paste the actual output of a refused release here — the real error text, scrubbed of repository paths and hostnames.]]">
+{`[[TK]]`}
+</Artefact>
+
+The deliberate part: the five checks are not restated anywhere. Not in a runbook, not in the onboarding notes, not in the instruction files the AI
+assistants read. Every duplicated checklist is a future drift bug, and the failure mode is worse than
+drift — people trust the copy. The documentation now says that the workflow is the authority, and
+that if it refuses you should read its error, which names the check that failed.
+
+### What it cost
+
+Merging makes a repository temporarily unreleasable. Trunk moves ahead of the `staging` tag, the
+equality check then refuses everything, and it stays refused until a staging deploy runs. In practice
+that inverts the obvious order of work: release what is already merged first, then merge the next
+batch. [[TK: how often does this actually bite, and has it ever delayed something that mattered?]]
+
+Promotion is by commit, not by binary. A `production-*` tag is immutable and points at the exact
+commit staging validated, but the deploy rebuilds from it, so there are no bit-identical artefacts
+between environments. That is a known trade-off rather than an oversight, and it is worth naming
+because it reads as artefact promotion in a diagram and is not.
+
+Deploy and release are still the same event. There is no feature-flag tooling, so a deployed change
+is a released change. Integration and deployment are genuinely decoupled — merging ships nothing —
+but the second half of that split is unbuilt.
+
+And some of it is not finished at all. One browser application deploys with no health gate and no
+smoke test, so a green run there means an upload command exited zero and nothing more; it is checked
+by hand every release, which works exactly as long as somebody remembers. One service has no
+production path, sitting on infrastructure that predates this model, which also leaves it with no
+emergency hotfix lane. The end-to-end suite gates nothing — it exists, it is good, and no repository
+requires it as a merge check, which makes it documentation rather than a gate.
+
+There is also a control we thought we had and did not. Where one person is the sole code owner of a
+path and authors the change themselves, no owner review is requested, and a single peer approval
+satisfies the requirement. The fix is a second individual owner, not a team — a team containing the
+author has the same hole.
+
+## What I'd do differently
+
+This has been live across all six repositories since 27 July 2026. Most of the time it has cost us
+has gone to checks that could not have produced a different answer.
+
+[[TK: did the continue-on-error and queued-runner cases happen before or after 27 July 2026? I've
+avoided implying either way.]]
+
+A step marked continue-on-error reports `conclusion: success` when it failed; the truth is in
+`outcome`. Fetching a run's log echoes each script block's source, so grepping for an error string
+matches the echoed line whether or not it ever ran. A run queued with no available runner is
+indistinguishable from one that is progressing, and nothing ever fails — no timeout, no alert. We
+have seen that twice, once for 26 hours, with the tag cut and the release looking committed while
+nothing had deployed.
+
+The most recent one was not in the pipeline at all. A fix for fabric swatch resolution could not be
+rehearsed on staging, because staging has no swatch imagery in it — so the positive case cannot
+happen there no matter what you type, and "no image appeared" is also what a correct fix looks like
+on the negative case. Going through the motions would have produced something indistinguishable from
+a pass.
+
+The check I would build first, before any of the five, is the one that asks what red would have
+looked like. [[TK: is that fair — or would you have changed the order of something else instead?
+This section is meant to be specific to this system, not advice.]]
