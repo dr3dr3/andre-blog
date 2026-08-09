@@ -10,7 +10,7 @@ Personal technical blog for André Dreyer at [andredreyer.com](https://andredrey
 2. **Never write in first person as André.** You draft and edit from material he supplies. You do
    not generate his experience.
 
-Also: never set `draft: false`, never publish, never `terraform apply`, never deploy.
+Also: never set `draft: false`, never publish, never change DNS or Vercel settings, never deploy.
 
 ## Stack
 
@@ -22,8 +22,7 @@ Also: never set `draft: false`, never publish, never `terraform apply`, never de
 | JS | None on content pages except Vercel Analytics |
 | Package manager | pnpm, pinned via `packageManager` |
 | Hosting | Vercel, Hobby, deployed by the Git integration |
-| DNS | Route 53, `ap-southeast-2`, Terraform |
-| IaC | Terraform ~> 1.13, S3 backend with `use_lockfile` |
+| DNS | Route 53, set by hand. See [docs/INFRA.md](docs/INFRA.md) — the zone also carries mail. |
 
 **Rejected, do not add:** HTMX · Tailwind · a CMS · comments · site search · a dark-mode toggle
 (respect `prefers-color-scheme`) · newsletter signup · view counters · webmentions · tag clouds ·
@@ -38,7 +37,7 @@ reading-progress bars · syntax highlighting · share buttons · an author photo
 | [docs/LINKEDIN.md](docs/LINKEDIN.md) | Distribution |
 | [docs/DESIGN.md](docs/DESIGN.md) | Design tokens. A stub, pending a design pass. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phase 2 and beyond. All not-now. |
-| [infra/README.md](infra/README.md) | Terraform, and the Vercel import path |
+| [docs/INFRA.md](docs/INFRA.md) | Vercel and DNS, as configured. Read before touching either. |
 
 ## The writing loop
 

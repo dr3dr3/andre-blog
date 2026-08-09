@@ -1,6 +1,5 @@
 {
-    // Rename this to match your project after cloning the template.
-    "name": "DR3DR3-DEVCONTAINER-TEMPLATE",
+    "name": "andre-blog",
 
     "build": {
         "dockerfile": "Dockerfile"
@@ -20,7 +19,7 @@
     // Why it matters: on a Windows host the bind mount is v9fs, where a single
     // small file read costs ~12ms. Astro's dev server needs ~48s to become ready
     // there and its file watcher never fires, so it serves stale pages after an
-    // edit. The same tree on ext4 is ready in 1s and watches correctly. Builds
+    // edit. The same tree on ext4 is ready in 2s and watches correctly. Builds
     // are fine either way; it is only the dev server that suffers.
     //
     // Opening this folder as a plain bind mount still works — VS Code falls back

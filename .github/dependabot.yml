@@ -19,13 +19,6 @@ updates:
     commit-message:
       prefix: "deps"
 
-  - package-ecosystem: terraform
-    directory: "/infra"
-    schedule:
-      interval: weekly
-    commit-message:
-      prefix: "infra"
-
   - package-ecosystem: docker
     directory: "/.devcontainer"
     schedule:
