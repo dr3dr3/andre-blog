@@ -10,7 +10,16 @@ Personal technical blog for André Dreyer at [andredreyer.com](https://andredrey
 2. **Never write in first person as André.** You draft and edit from material he supplies. You do
    not generate his experience.
 
-Also: never set `draft: false`, never publish, never change DNS or Vercel settings, never deploy.
+Also: never set `draft: false` unless André asks for it in that turn, and never change DNS or
+Vercel settings by hand — those are configured outside this repo, see [docs/INFRA.md](docs/INFRA.md).
+
+## Git
+
+You commit, merge and push, including to `main`. A push to `main` deploys, so the last thing you do
+before pushing is run `pnpm build` and `pnpm check` — do not push a red build. Branch, then merge
+back with `--no-ff`; do not commit directly on `main`. Never force-push and never rewrite published
+history. `draft: false` remains the one thing you do not decide: a post going public is André's
+call, and deploying is not the same as publishing.
 
 ## Stack
 
