@@ -3,7 +3,7 @@
 Personal technical blog for André Dreyer — [andredreyer.com](https://andredreyer.com).
 
 Astro, static output, MDX posts in the repo, plain CSS, no client-side JavaScript beyond Vercel
-Analytics. Deployed by Vercel's Git integration; DNS and Vercel project configuration in Terraform.
+Analytics. Deployed by Vercel's Git integration; DNS in Route 53.
 
 [CLAUDE.md](CLAUDE.md) is the entry point for anything working in this repo.
 
@@ -32,9 +32,9 @@ around 12ms. Measured on this project, with everything else identical:
 | Working tree on | `astro dev` ready | File watcher |
 | --- | --- | --- |
 | v9fs bind mount (a Windows drive) | 48–53s | never fires — serves stale pages after an edit |
-| ext4 (a container volume) | **1s** | works |
+| ext4 (a container volume) | **2s** (3s on the first start after `pnpm install`) | works |
 
-`astro build` is unaffected either way, at about 4 seconds. It is only the dev server that suffers,
+`astro build` is unaffected either way, at 2–4 seconds. It is only the dev server that suffers,
 because Vite fetches thousands of modules through its SSR module runner on first request. Disabling
 the watcher does not help, and a polling watcher makes it worse — the server then never becomes
 ready at all. Cloning into the WSL2 Linux filesystem works equally well if you prefer that; the
@@ -73,12 +73,12 @@ Sharing on LinkedIn: [docs/LINKEDIN.md](docs/LINKEDIN.md).
 
 ## Deploying
 
-Push to `main`. Vercel's Git integration builds and deploys; nothing else is involved and Terraform
-plays no part in it. Pull requests get preview deployments automatically.
+Push to `main`. Vercel's Git integration builds and deploys; nothing else is involved. Pull
+requests get preview deployments automatically.
 
-Terraform owns DNS and the Vercel project's configuration only, and is applied by hand. CI plans on
-pull requests touching `infra/` and never applies. Setup, the import path for the existing Vercel
-project, and the required secrets are in [infra/README.md](infra/README.md).
+The Vercel project settings, the two domains and the Route 53 records behind them are set by hand
+and written down in [docs/INFRA.md](docs/INFRA.md). Read that before changing DNS — the zone also
+carries the mail records.
 
 ## Layout
 
@@ -87,9 +87,8 @@ project, and the required secrets are in [infra/README.md](infra/README.md).
 | `src/content/posts/` | posts, MDX |
 | `src/lib/` | `posts.ts` (the only reader of the collection), `dora.ts`, `format.ts` |
 | `src/styles/tokens.css` | every colour and type token; the only file with a literal colour |
-| `docs/` | writing, archetypes, LinkedIn, design, roadmap |
+| `docs/` | writing, archetypes, LinkedIn, design, roadmap, infrastructure |
 | `.claude/` | skills and slash commands |
-| `infra/` | Terraform |
 | `public/` | fonts, `llms.txt`, favicon |
 
 ## Licence
