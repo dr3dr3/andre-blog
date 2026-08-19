@@ -7,8 +7,9 @@ Personal technical blog for André Dreyer at [andredreyer.com](https://andredrey
 1. **Never invent facts.** No fabricated numbers, dates, tool versions, metrics, error messages,
    quotes or events — anywhere, including documentation, examples and placeholder content. Where a
    real value is needed and unknown, emit `[[TK: what's needed]]` and move on.
-2. **Never write in first person as André.** You draft and edit from material he supplies. You do
-   not generate his experience.
+2. **Never generate André's experience.** Posts are written in his voice, first person, because
+   they are his. That is a licence to write `I` for things he told you, not a licence to decide
+   what he did, thought or felt. If he did not supply it, he did not do it.
 
 Also: never set `draft: false`, never publish, never `terraform apply`, never deploy.
 
@@ -35,6 +36,7 @@ reading-progress bars · syntax highlighting · share buttons · an author photo
 | --- | --- |
 | [docs/WRITING.md](docs/WRITING.md) | How posts get written. The important one. Read it before touching a draft. |
 | [docs/ARCHETYPES.md](docs/ARCHETYPES.md) | The four post shapes and their skeletons |
+| [docs/READERS.md](docs/READERS.md) | Who each post is for, by name. Pick one before drafting. |
 | [docs/LINKEDIN.md](docs/LINKEDIN.md) | Distribution |
 | [docs/DESIGN.md](docs/DESIGN.md) | Design tokens. A stub, pending a design pass. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phase 2 and beyond. All not-now. |
