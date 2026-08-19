@@ -1,0 +1,243 @@
+---
+title: 'The session tracker I filled in once'
+summary: 'I started 225 sessions in 34 days and could see four at a time. This is the index I built for them, the one day I filled it in, and the morning I did not open it.'
+published: 2026-08-18
+archetype: 'war-story'
+context: 'a one-person platform load run across dozens of concurrent AI coding sessions on a single workstation'
+stack:
+    - name: 'Claude Code'
+      version: '2.1.220 and 2.1.223 — the versions running on 6 August 2026'
+    - name: 'VS Code devcontainer'
+      version: 'Ubuntu 24.04 base, Node 22, docker-outside-of-docker'
+    - name: 'Docker on WSL2'
+      version: '29.7.2 [[TK: current reading — was this the version in August 2026?]]'
+outcome:
+    status: 'still-running'
+tags: ['ai-sessions', 'tooling']
+draft: true
+---
+
+import Artefact from '../../components/Artefact.astro';
+
+`[[TK: PUBLISHED DATE IS A PLACEHOLDER. Set to 2026-08-18 only so the content schema parses —
+z.date() will not accept a marker. André sets the real date at publish.]]`
+
+Four panes fit across my monitor. On 6 August the tracker meant to index them listed fifty-eight
+sessions.
+
+Four is the only number in this post I chose. Everything else got counted afterwards. It is what
+fits across a 49-inch screen in VS Code, and it is about as many threads as I can hold at once. Each
+pane is one Claude Code session in the extension panel, running against a devcontainer on a Windows
+11 machine with Docker Desktop underneath. Across every transcript on the box, 99.7% of my activity
+is in that panel rather than a terminal.
+
+Four is what I can see. It is not what exists. I start a session while another one is working,
+because an idea is worth chasing, or a finding wants breaking out on its own, or someone has posted
+something, and none of them close when I move on. Between 15 July and 18 August 2026 I started 225
+sessions across 34 active days. A median of 5.5 a day, peaking at 19. Of those, 120 were still
+taking messages on a later calendar day than the one they began.
+
+Underneath it, the devcontainer runs three PHP backends, three Node frontends, MySQL, Redis, a mail
+catcher and an object store, and wants 16 GB of memory and four CPUs as a floor. I use worktrees
+heavily, because several streams run at once and the local stack has to sit on whichever branch is
+checked out. Cleaning them up is the step I miss. There are 161 worktrees registered across the
+checkouts, against one shared working copy per repository.
+
+Git owns my branches. GitHub owns my pull requests. Linear owns my tickets, and I use it constantly.
+What it does not hold is work in flight. I did not learn that here; I learned it from years of Jira.
+A ticket says what should happen. It does not say which window it was happening in.
+
+Nothing owned the sessions.
+
+## What went wrong
+
+When it goes, it goes all at once. An intermittent video-driver fault takes the machine down, or
+Docker Desktop stops, or the devcontainer wants rebuilding, and every session dies together. `[[TK:
+is the Oculink cable established as the cause, or still a suspicion? And was 11 August a
+video-driver crash that took Docker with it, or Docker alone?]]`
+
+What I have left afterwards is the resume picker. The command is fast. Finding the session is not.
+Sifting that list can take me half an hour. `[[TK: is the 30 minutes an estimate of a repeated
+experience, or was it ever timed?]]`
+
+The reason is in how the list gets built. Each transcript carries a title generated from the
+session's opening prompt. Of my 225, 220 have one and five have none, which show up untitled. There
+is no summary record in any transcript on the machine, so that title is all I get, and the opening
+prompt is almost never what the session became.
+
+`[[TK: paste the actual thirty-row session-title table here — timestamps, transcript line
+counts, stored titles. It is in the evidence pack at wip-tracker.eval.md §10 on the other
+container, and is not in the brain-dump. Scrub colleague names before it goes in.]]`
+
+Two of my thirty most recent sessions carry the same title. A third is the same release work under
+a different one. Eight of the thirty are named after where the request arrived rather than what it
+turned into, all of them some variation on a Slack thread. And the biggest session in that window
+ran to 1,865 lines and 56 of my turns and was still going twelve and a half hours later. It is
+called `Daily scrum meeting`.
+`[[TK: the eval's prose says the two identical titles were four hours apart at 21:17 and 21:38 on
+17 August, but its own table shows 21:17 and 05:57 the next day. Which is right?]]`
+
+The picker sorts by recency and titles by first impression. Neither is how I remember work. Half an
+hour of reading is the smaller cost. The larger one is sitting there afterwards not quite sure
+whether I have got everything back.
+
+It does not always go like that. On 16 July I gave a session four words, `PC restarted... please
+continue`, and it picked up where it had stopped. Nothing was lost that I could measure.
+
+## What I tried first
+
+On 22 July I built something. It took about an hour and ten minutes.
+
+One JSON file per session in a gitignored directory, keyed by the session's resume id. Each record
+holds the mapping from session to work: the pull requests it raised, the Linear ticket, a state I
+set by hand, and a next action. Pull request state, CI and deploy status are deliberately not
+stored. They get re-read on every view, and where a deploy state cannot be established the board
+prints `unknown` rather than guessing. The skill sits in a public dotfiles repository, and its
+commit history is the record of everything that follows. It has a record of its own, opened 52
+minutes before the first commit and archived as done.
+
+Then it sat. Four records on 22 July, one on 24 July, nothing for the next thirteen days. I had
+built the thing and not formed the habit, which is the least interesting way this went wrong and
+also the first.
+
+On 6 August at 05:19 I went back to the session that had built it a fortnight earlier and typed:
+
+> For each current session I am going to start using our WIP tracker. What prompt do I provide
+
+That took most of the day. I opened 47 sessions in turn between 04:30 and 09:20 and registered each
+one, holding most of them for two to five minutes. The board grew as I went, and every figure here
+is a real render logged in a transcript at the time: 4, 5, 8, 9, 20, 40, 43, 47, 48, 51, 53, 55, 58.
+
+Seven commits landed that morning. Two were defects I hit while doing the backfill, and both of them
+were the tracker failing the way the sessions did.
+
+The first was registration. Registering a second session got treated as a duplicate of the first,
+which reads as an error rather than the normal case. Fixed at 05:56, and not fixed completely: two
+records in the directory today still carry the same resume id.
+
+The second was the branch. Each record captured the git branch of the session that wrote it, and at
+06:23 one of the sessions I was registering told me this:
+
+> The auto-captured branch is wrong, and not fixably so. It recorded
+> `docs/credential-rotation-runbook`. Minutes earlier the same checkout read
+> `fix/svc-a-staging-log-permissions` — another session moved it between my two commands. Neither is
+> this session's branch; mine was `fix/preview-media`, merged and gone.
+
+My repository checkouts are one working copy per repo, shared by every session, with those 161
+worktrees hanging off them. The branch in a record was whichever session had touched the checkout
+last. It only surfaced because that session happened to run the same command twice and got two
+different wrong answers minutes apart. One reading would have given it a single plausible wrong
+branch name and no reason to doubt it. Seven minutes and one commit to fix. Nothing had acted on the
+bad value.
+
+The other five commits were features rather than fixes. Four of them were scaffolding for the habit:
+a flag on the board for any record with no next action, a guided cleanup pass, a set of short spoken
+prompts to use instead of commands, and a command to print those prompts as a cheatsheet. One more
+followed the next morning for the commonest moment of all, which is having done more work and
+wanting the record to catch up. So four of the seven went on making the habit easy to perform. The
+fifth I come back to below.
+
+At 13:28, with the sweep finished, Docker carked it. How many sessions that took, I cannot say. One
+killed before I reached it left no record, and looks exactly like one I never got to.
+
+## What worked, and what it cost
+
+The board existed, and it showed me something I had not known.
+
+<Artefact caption="Two entries from my board at its peak, 6 August 2026. Same pull request, two sessions. Repository name replaced, other entries elided.">
+{`WIP — 58 active session(s)   ·   2026-08-06 13:23 UTC
+...
+🚀  Credential rotation runbook  —  merged — verify & archive
+   svc-a#263 (merged CI✓) · main:unknown
+   ▶ get a review on svc-a#263, then merge to main
+   ↳ claude --resume 31fbc1d6-...   · /workspace
+...
+🚀  Credential rotation runbook  —  merged — verify & archive
+   svc-a#263 (merged CI✓) · main:unknown
+   ▶ PR #263 merged to main — docs-only, nothing to deploy; archive once confirmed no follow-up
+   ↳ claude --resume e5129529-...   · /workspace @ docs/credential-rotation-runbook`}
+</Artefact>
+
+Same pull request, two sessions, two next actions that disagree about what state it is in. That is
+not a tracker bug. That is two of my sessions doing one piece of work, on one screen, for the first
+time. `[[TK: did you know these two were the same work before the board showed you? Was any of it
+done twice?]]`
+
+The split between the re-read fields and the ones I type held in the direction I expected. Eight of
+my currently active records have all their pull requests merged, and four of those carry a hand-set
+state contradicting it, two saying blocked and two awaiting review. The re-read fields either
+resolved or admitted they could not. The ones I typed went stale.
+
+Building it cost four hours and eight minutes of my active time across seven calendar days, 34 turns
+in one session. Filling it in that once ran from 05:24 to 13:22 of a single day.
+
+Five days later Docker went again.
+
+<Artefact caption="What I typed into six of my sessions on 11 August 2026, within eight minutes of each other. From the transcripts, verbatim.">
+{`11:37:27  Docker crashed and I lost the Claude sessions I have opened. I want to
+          find the ones below and resume them... can you give me the command or
+          how to do so
+            1. Planning the next release
+            2. Production release workflow
+            3. Demo tenant setup
+11:41:16  Docker crashed, had to resume. Where are we at?
+11:41:58  Docker crashed, had to resume. Where are we at?
+11:42:32  Docker crashed, had to resume. Where are we at?
+11:43:26  Docker crashed, we had to resume. Where are we at?
+11:45:32  Docker crashed, we had to resume. Where are we at?`}
+</Artefact>
+
+Seventeen sessions were alive when it went. Nine took another message afterwards. Eight never did.
+`[[TK: what did those eight cost? Was that work redone, picked up elsewhere, or lost?]]`
+
+None of the seventeen had a record in the tracker. It had been sitting there three weeks with 27
+records in it and I did not open it. What I did instead is in that first prompt: I typed out three
+session names from memory, and then went and found them with grep.
+
+> No embedded summaries in the transcripts — I'll identify them by their first user prompt instead.
+
+The reason none of the seventeen was tracked is the capture rate.
+
+<Artefact caption="My sessions holding a tracker record, by the date the session started. Counted by joining transcript filenames against the resume id stored in each record.">
+{`window                                sessions   with a record     rate
+whole history (15 Jul – 18 Aug)            225              63    28.0%
+started before 6 August                    108              60    55.6%
+started on or after 6 August               117               3     2.6%
+started on or after 11 August               80               1     1.2%`}
+</Artefact>
+
+Fifty-six of the 64 records were created on 6 August, between 05:24 and 13:22. Outside that day and
+the day I built the skill, four records have ever been created: one on 24 July, two on 9 August, one
+on 17 August. So the 55.6% is not a habit that worked and then lapsed. It is the backfill projected
+backwards onto sessions that had started weeks before it. From 2 August onward my daily capture rate
+is zero on 22 of 25 days.
+
+The obvious objection to 28% is that plenty of those sessions were never meant to be tracked.
+Dropping everything with a single turn of mine lifts it to 31.2%. `[[TK: the other thresholds the
+eval computed — file-written, duration, and the combinations — and what each does to the number.
+They are in wip-tracker.eval.md §3 and not in the brain-dump.]]` No threshold I can defend moves it
+far.
+
+And the part built for exactly that morning has never run. Continuing a piece of work in a fresh
+session, rather than hunting down the old one, is something I described at 06:49 on 6 August in
+almost those words, and it shipped twelve minutes later. No record in the directory or the archive
+has ever been through it.
+
+Every record I have carries a next action, which sounds like discipline and mostly is not: the tool
+asks for one at registration and renders it on every row, so a record without one is close to
+unreachable. For 33 of the 63 records whose session has since gone quiet, I last edited the record
+before that session's final message. The work carried on. The note stayed where it was.
+
+My records have a median working life of 34 minutes. Sixty-three per cent I never touched again
+after the hour I created them. Of the 27 still active, 26 have had no session activity for at least
+a week. The 37 that reached the archive are where the finished work went.
+
+## What I would do differently
+
+I would not make the capture depend on me remembering. A stop hook, so stepping away from a session
+writes the record without being asked, and a scheduled sweep to close out records whose pull
+requests have all merged. Both were named as the planned second version on 22 July, before any of
+this was measured, and I have built neither.
+
+My transcripts come to 1.1 GB across 222 files. The records that index them come to 264 KB. On
+11 August I searched the 1.1 GB.
