@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+    title="Colophon — André Dreyer"
+    description="How the posts on this site get written, and what the site is built from."
+>
+    <article>
+        <h1>Colophon</h1>
+        <div class="prose">
+            <p class="placeholder">
+                Placeholder. Drafted from the rules in the repository, not from André's own words —
+                read it back in his voice before this ships. Every mechanical claim on the page was
+                taken from CLAUDE.md, docs/WRITING.md, docs/DESIGN.md or the build config, and none
+                of it is invented.
+            </p>
+
+            <h2>How the posts get written</h2>
+
+            <p>
+                Every post here is drafted by an AI from notes I write first. The notes come before
+                anything else: what happened, in what order, what broke, what it cost. The AI turns
+                that into prose. It does not decide what happened, and it does not supply numbers.
+            </p>
+            <p>
+                Two rules sit above every other instruction in the repository. Never invent a fact,
+                and never generate my experience. The second is what makes the first enforceable: if
+                a detail is not in my notes then it is not mine, and a plausible invention is worse
+                than a gap, because a gap gets fixed and an invention gets published. Where a figure
+                was needed and I had not counted it, the draft carries a marker instead. Either I
+                answer it or the sentence is cut. Nothing gets estimated into place.
+            </p>
+            <p>
+                After the draft comes a critic pass that returns objections and never rewrites
+                prose, two rounds at most, then a fact-checker that traces every number, date and
+                version back to the notes. Anything that does not trace is flagged as fabricated. I
+                set the publish flag by hand, and no part of the process is allowed to set it for
+                me.
+            </p>
+            <p>The sentences are machine-made. What they describe is not.</p>
+
+            <p class="placeholder">
+                [[TK: one line here in André's voice if the page wants to be lighter — a joke about
+                the arrangement reads as his or not at all, so it has to be written by him.]]
+            </p>
+
+            <h2>How the site is built</h2>
+
+            <p>
+                Astro 7, static output, no adapter and no server. MDX files in a git repository, no
+                CMS. Plain CSS with custom properties, no framework. The only JavaScript that
+                reaches the page is Vercel Analytics.
+            </p>
+            <p>
+                Titles and metadata are set in JetBrains Mono, body text in Newsreader, both
+                self-hosted from this domain as variable subsets under the SIL Open Font License.
+                Nothing is fetched from a third-party CDN at runtime. Colours follow the operating
+                system's light or dark setting and there is no toggle.
+            </p>
+            <p>
+                There is no syntax highlighting, because the blog does not publish code. The
+                highlighter is switched off in the build configuration rather than merely unused.
+                Evidence comes from artefacts instead: log excerpts, timing tables, error messages,
+                lines off a bill.
+            </p>
+            <p>
+                Hosting is Vercel, deployed by its Git integration on a push to the main branch. DNS
+                is Route 53 in ap-southeast-2, managed by Terraform and applied by hand.
+            </p>
+
+            <h2>The numbers in the footer</h2>
+
+            <p>
+                They are the four DORA metrics, computed from this repository's git history when the
+                site is built. Two of them are real. Change failure rate and time to restore need
+                deployment outcomes the static build cannot see, so they render as an em dash and
+                keep their labels. An em dash there means the number is not available, not that it
+                is zero.
+            </p>
+
+            <h2>The source</h2>
+
+            <p>
+                The repository is public, at <a
+                    href="https://github.com/dr3dr3/andre-blog"
+                    rel="noopener">github.com/dr3dr3/andre-blog</a
+                >. The writing rules are in <code>docs/WRITING.md</code>, including the list of
+                words that are banned outright.
+            </p>
+        </div>
+    </article>
+</BaseLayout>
