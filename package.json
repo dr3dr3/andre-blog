@@ -12,7 +12,8 @@
         "build": "astro build",
         "preview": "astro preview --port 4380 --host 0.0.0.0",
         "check": "astro check",
-        "astro": "astro"
+        "astro": "astro",
+        "publish-post": "node scripts/publish-post.mjs"
     },
     "dependencies": {
         "@astrojs/mdx": "^7.0.5",
