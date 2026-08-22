@@ -6,11 +6,16 @@
  * than an inversion, so its values are chosen against a slate ground rather
  * than derived from the light ones.
  *
- * --ink, --paper, --signal and --amber are the specified palette. --muted and
- * --faint were shifted one step darker (lighter, in dark) than specified: the
- * original --faint measured 2.49:1 on --paper, and every value that clears AA
- * on that ground sits within a hair of the original --muted. Moving both keeps
- * three distinct tone levels instead of collapsing them into two.
+ * --ink, --paper, --ok and --warn are the specified palette; --ok and --warn
+ * carry the values that shipped as --signal and --amber. --muted and --faint
+ * were shifted one step darker (lighter, in dark) than specified: the original
+ * --faint measured 2.49:1 on --paper, and every value that clears AA on that
+ * ground sits within a hair of the original --muted. Moving both keeps three
+ * distinct tone levels instead of collapsing them into two.
+ *
+ * Every status hue clears WCAG AA against its own ground at the 11.5px utility
+ * size. Colour never carries meaning on its own here — the word it tints
+ * always states the same thing.
  */
 
 :root {
@@ -26,9 +31,16 @@
     --rule: #d8dad5;
     --muted: #4d514d; /* 7.40:1 */
     --faint: #6b6f6a; /* 4.68:1 — the AA floor for 11.5px utility text */
-    --signal: #2f5d50; /* eucalyptus — links and positive outcomes */
-    --amber: #8c5a2b; /* abandoned outcomes only */
     --wash: #eaece7; /* artefact blocks */
+
+    /* Status. Named for the job, not the hue, so a value can shift without the
+     * token lying. Green, blue and amber label an outcome; red is reserved for
+     * evidence of a failure and is deliberately rare. `experiment` takes no
+     * colour at all — --muted is the fifth state, "no verdict yet". */
+    --ok: #2f5d50; /* eucalyptus — shipped */
+    --info: #2c5578; /* slate — links, focus rings, still-running */
+    --warn: #8c5a2b; /* rust — abandoned */
+    --bad: #8e3b34; /* oxide — failure artefacts */
 
     /* Type */
     --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -49,15 +61,18 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        /* A deep cool slate ground, warm off-white ink, eucalyptus raised in
-         * luminance so it still reads as a link rather than as body text. */
+        /* A deep cool slate ground and warm off-white ink. Every status hue is
+         * raised in luminance so it still separates from body text on slate. */
         --ink: #e9e4db;
         --paper: #15181b;
         --rule: #2a2f33;
         --muted: #b3b8b0; /* 8.83:1 */
         --faint: #8f968f; /* 5.88:1 */
-        --signal: #79b39c;
-        --amber: #c68b52;
         --wash: #1c2024;
+
+        --ok: #79b39c;
+        --info: #84aecf;
+        --warn: #c68b52;
+        --bad: #d9938b;
     }
 }

@@ -2,12 +2,22 @@
 interface Props {
     /** Optional caption, rendered below the block. Says what this is and where it came from. */
     caption?: string;
+    /**
+     * Marks the block as evidence of the failure itself — the log line, error or
+     * graph the story turns on. Draws a red rule down the edge and nothing else.
+     *
+     * The rule is emphasis, never information: the prose around the artefact has
+     * already said this is the failure, so a reader who cannot see the colour
+     * loses nothing. Use it once or twice in a post. Every artefact marked is one
+     * less that reads as marked.
+     */
+    severity?: 'failure';
 }
 
-const { caption } = Astro.props;
+const { caption, severity } = Astro.props;
 ---
 
-<figure class="artefact">
+<figure class:list={['artefact', severity && `artefact--${severity}`]}>
     <pre><slot /></pre>
     {caption && <figcaption>{caption}</figcaption>}
 </figure>
