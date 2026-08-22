@@ -20,6 +20,13 @@ You need both. If either is missing, ask for it and stop.
 2. **An archetype** — one of `war-story`, `decision-record`, `teardown`, `field-note`. If it has not
    been chosen, propose one with a sentence of reasoning and wait.
 
+The brain-dump usually also carries a `Reader:` line naming one entry in
+[docs/READERS.md](../../../docs/READERS.md), and a moment. Read that entry before drafting. It
+decides what you may skip, what you have to prove, and where the post has to land — a reader who
+already knows the ground does not get it explained, and the moment is what the post has to reach. If
+there is no `Reader:` line, draft anyway and emit
+`[[TK: which reader, and what moment?]]`. Never choose one yourself.
+
 The post file usually already exists from `/newpost`, with frontmatter and `draft: true`.
 
 ## What you may and may not do
@@ -36,6 +43,10 @@ The post file usually already exists from `/newpost`, with frontmatter and `draf
 - Invent a number, date, version, duration, error message, quote or event. Not one, not as a
   placeholder, not "roughly", not as an illustrative example.
 - Infer what André thought, felt or decided if he did not say.
+- Widen a post to serve more than one reader, or add material because a second reader might want it.
+- Address the reader. The post is written *for* them, never *to* them — no "you may be wondering",
+  no second person aimed at the named reader, and nothing that only makes sense to someone who knows
+  him. Every reader in READERS.md arrives by transmission, so the post has to stand alone.
 - Add a detail because the paragraph feels thin. A thin paragraph gets a `[[TK:` or gets cut.
 - Name a company. See WRITING.md §8.
 - Write in a voice that grades the work. See WRITING.md §3.

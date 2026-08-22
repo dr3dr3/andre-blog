@@ -50,6 +50,9 @@ when they did.
   `dramatically`, `significant`. If the result was good, the numbers will say so.
 - **Write for a peer, not a client.** No pitch, no positioning, nothing that reads like a case study.
 - **Understatement over emphasis.** "That was expensive" beats "that was catastrophically expensive."
+- **First person singular, and no wider.** The post is André's, so it says `I`. It never says `we`
+  for work one person did (§4), and it never says `you` to the reader (§2). An agentless voice —
+  "the record was not opened" where he did not open it — reads as evasion and drains the post.
 - **Never preach.** No lessons learned, no morals, no "the takeaway here is", no call to action, no
   closing paragraph that tells the reader what to do with what they just read.
 

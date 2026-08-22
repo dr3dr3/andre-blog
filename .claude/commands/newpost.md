@@ -18,6 +18,7 @@ arrange into an argument. This is raw material.
 Ask in roughly this order, following whatever thread turns out to be interesting:
 
 - What is this about, in one sentence?
+- **Who is this for, and what are they in the middle of?** See §1a below.
 - What existed before? What was it for, and what constrained it?
 - What went wrong, and how was it noticed?
 - What was tried first? What did each attempt cost?
@@ -41,6 +42,34 @@ Rules while interviewing:
 Write it to `drafts/<slug>.brain-dump.md`. That directory is gitignored, because brain-dumps hold
 raw names, internal detail and unscrubbed artefacts. **It never gets committed.**
 
+## 1a. The reader
+
+Every post is written for one reader from [docs/READERS.md](../../docs/READERS.md). Settle this
+before the archetype, because the reader and their moment narrow the shape.
+
+- Offer the existing entries by alias, with the class each stands for. Let him pick one.
+- **One reader. Never a blend.** Blending gets the average of everyone, which is the thing naming a
+  reader is for.
+- If he names someone not in the file, capture the alias, the class they stand for, and the moment.
+  Propose adding an entry — do not add one silently, and do not put a real name in it.
+- If the reader forwards rather than uses, the post is written for whoever receives it. Record both.
+- Ask the moment as *what would they be in the middle of*, not *would they find this interesting*.
+  If the only answer is that they would enjoy it, record that honestly — a reader with no moment is a
+  real finding and it changes how the post gets written. Do not manufacture one.
+- Run the publish test: **would this post exist if that reader never saw it?** If no, say so. It is
+  outreach rather than a post, and a message is the better move.
+
+Record at the top of the brain-dump:
+
+```
+Reader: <alias> — <the class they stand for>
+Terminal reader: <who receives it, if the reader forwards>
+Moment: <what they are in the middle of, or "none — feed reader">
+```
+
+If he does not want to name one, `[[TK: which reader, and what moment?]]` and carry on. Do not pick
+one on his behalf.
+
 ## 2. Pick an archetype
 
 Propose one from [docs/ARCHETYPES.md](../../docs/ARCHETYPES.md) with a sentence of reasoning, and
@@ -49,6 +78,12 @@ let him confirm or override.
 Quick guide: something that involved being wrong for a while is a `war-story`; a fork in the road is
 a `decision-record`; an assessment of a tool used in anger is a `teardown`; one true small thing is
 a `field-note`.
+
+The moment from §1a narrows it further. A reader about to make the same call wants a
+`decision-record`; about to adopt the same tool, a `teardown`; about to inherit the same mess, a
+`war-story`; who would just like to know a true thing, a `field-note`. Where the moment and the
+material disagree, the material wins — a war story needs something that went wrong, and no reader
+conjures one.
 
 ## 3. Scaffold the post
 
