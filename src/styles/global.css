@@ -125,13 +125,13 @@ main,
 }
 
 a {
-    color: var(--signal);
+    color: var(--info);
     text-decoration-thickness: 1px;
     text-underline-offset: 0.18em;
 }
 
 :focus-visible {
-    outline: 2px solid var(--signal);
+    outline: 2px solid var(--info);
     outline-offset: 3px;
     border-radius: 2px;
 }
@@ -242,7 +242,7 @@ main {
 
 .post-index > li > a:hover {
     text-decoration: underline;
-    text-decoration-color: var(--signal);
+    text-decoration-color: var(--info);
 }
 
 .summary {
@@ -400,18 +400,33 @@ h1 {
 }
 
 /* ---------------------------------------------------------------------------
- * Outcome — the only place colour carries meaning.
+ * Outcome — the status vocabulary from the content schema, coloured.
+ *
+ * Green is a verdict, blue is a state, amber is a caution. `abandoned` is not
+ * red: on this site it is an honest result, not a failure. Red belongs to the
+ * artefact block below and to nothing on this row.
+ *
+ * The colour is never the only carrier. Each of these tints a word that already
+ * says the same thing, which is what keeps the row readable to a reader who
+ * cannot separate the hues.
  * ------------------------------------------------------------------------ */
 
-.outcome-shipped,
+.outcome-shipped {
+    color: var(--ok);
+}
+
+/* In production, no verdict yet — informational rather than a claim that it
+ * worked. Blue is also the link colour, but a status never sits inline with a
+ * link, and links on this site are underlined. */
 .outcome-still-running {
-    color: var(--signal);
+    color: var(--info);
 }
 
 .outcome-abandoned {
-    color: var(--amber);
+    color: var(--warn);
 }
 
+/* Uncoloured on purpose. Grey is the fifth signal: no verdict yet. */
 .outcome-experiment {
     color: var(--muted);
 }
@@ -441,6 +456,15 @@ h1 {
     font-size: 0.8125rem;
     line-height: 1.55;
     tab-size: 4;
+}
+
+/* Evidence of the failure itself — the log excerpt or error that a war story
+ * opens its second section on. A rule down the edge, nothing else: the block
+ * still has to read as the thing it was copied from. */
+.artefact--failure pre {
+    border-left: 2px solid var(--bad);
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
 }
 
 .artefact figcaption {
