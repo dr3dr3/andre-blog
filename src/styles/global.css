@@ -221,6 +221,11 @@ main {
     color: var(--faint);
 }
 
+/* The reset zeroes paragraph margins, and the footer has no `> * + *` rule. */
+.site-footer p + p {
+    margin-top: 0.4rem;
+}
+
 /* ---------------------------------------------------------------------------
  * Index
  * ------------------------------------------------------------------------ */
