@@ -49,6 +49,7 @@ reading-progress bars · syntax highlighting · share buttons · an author photo
 | [docs/DESIGN.md](docs/DESIGN.md) | Design tokens. A stub, pending a design pass. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phase 2 and beyond. All not-now. |
 | [docs/INFRA.md](docs/INFRA.md) | Vercel and DNS, as configured. Read before touching either. |
+| [docs/METRICS.md](docs/METRICS.md) | What the four footer numbers count, and what they refuse to answer. |
 
 ## The writing loop
 
