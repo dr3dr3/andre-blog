@@ -7,6 +7,7 @@ import { getDora } from '../lib/dora';
 const { samples } = getDora();
 
 const posts = (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`;
+const have = (n: number) => (n === 1 ? 'has' : 'have');
 ---
 
 <BaseLayout
@@ -93,9 +94,11 @@ const posts = (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`;
             <p>
                 The last three also stay quiet until they rest on at least three posts, because a
                 median of one is that one value and a median of two is the midpoint between two.
-                Right now draft→live rests on {posts(samples.draftToLive)}, revised on {
+                Right now draft→live rests on {posts(samples.draftToLive)}, revised on the {
                     posts(samples.published)
-                } published, and time to revise on {posts(samples.revised)} that have been revised.
+                } published so far, and time to revise on the {posts(samples.revised)} that {
+                    have(samples.revised)
+                } been revised.
                 The full definitions, including what is excluded and why, are in
                 <code>docs/METRICS.md</code>.
             </p>
