@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 
 /**
  * The four DORA metrics for the footer, computed from git history at build time.
@@ -7,7 +8,7 @@ import { execFileSync } from 'node:child_process';
  * quietly dropping the labels. Change failure rate and time to restore need
  * deployment outcomes from the Vercel API, which is out of scope for v1; they
  * render as an em dash. An em dash also appears wherever git cannot answer
- * honestly — a shallow clone, a repository with no merges, no repository at
+ * honestly — a truncated clone, a repository with no merges, no repository at
  * all. Nothing here guesses, and nothing here throws: a build must not fail
  * because a footer could not be computed.
  */
@@ -23,14 +24,16 @@ const UNKNOWN = '—';
 const WINDOW_DAYS = 90;
 const DAYS_PER_MONTH = 30.437; // mean Gregorian month
 const MS_PER_DAY = 86_400_000;
+const DEEPEN_TIMEOUT_MS = 60_000;
 
 /** Run git and return trimmed stdout, or null if git fails for any reason. */
-function git(args: string[]): string | null {
+function git(args: string[], timeout?: number): string | null {
     try {
         const out = execFileSync('git', args, {
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'ignore'],
             cwd: process.cwd(),
+            timeout,
         });
         return out.trim();
     } catch {
@@ -54,8 +57,70 @@ function mainRef(): string | null {
     return git(['rev-parse', '--verify', '--quiet', 'HEAD']) ? 'HEAD' : null;
 }
 
-function isShallow(): boolean {
-    return git(['rev-parse', '--is-shallow-repository']) === 'true';
+/**
+ * The commits where a shallow fetch stopped, as recorded in .git/shallow. These
+ * look parentless to git even though the project continues past them, which is
+ * what makes them indistinguishable from a real root commit without this list.
+ *
+ * Empty for a full clone, and empty when the file cannot be read.
+ */
+function shallowBoundary(): Set<string> {
+    const path = git(['rev-parse', '--git-path', 'shallow']);
+    if (!path) return new Set();
+
+    try {
+        return new Set(readFileSync(path, 'utf8').split('\n').filter(Boolean));
+    } catch {
+        // The usual case: the clone is not shallow, so the file does not exist.
+        return new Set();
+    }
+}
+
+/**
+ * Whether the history reachable from `ref` covers the window being measured.
+ *
+ * A shallow clone is not automatically untrustworthy, which is the distinction
+ * this used to miss. Vercel builds from one, and a repository younger than the
+ * window fits inside it whole: the oldest commit reachable is the real root,
+ * nothing is missing, and the counts over the window are exact. Comparing that
+ * commit's date against the window start cannot tell a young project from a
+ * truncated one, so it reported every young project as unmeasurable — and would
+ * have gone on doing so once the project aged past the window, because a
+ * depth-limited clone does not reach back that far either.
+ *
+ * What actually matters is whether the oldest commit is a graft.
+ */
+function historyCoversWindow(ref: string, since: Date): boolean {
+    const log = lines(git(['log', ref, '--first-parent', '--format=%H %cI']));
+    if (log.length === 0) return false;
+
+    const [sha, date] = log[log.length - 1]!.split(' ');
+    if (!sha || !date) return false;
+
+    // Reaches back past the window, so nothing inside the window is missing.
+    if (new Date(date).getTime() < since.getTime()) return true;
+
+    // Otherwise it covers the window only if it starts at the beginning of the
+    // project rather than at the point a shallow fetch stopped.
+    return !shallowBoundary().has(sha);
+}
+
+/**
+ * Ask the remote for the rest of the history, when the clone has been cut short.
+ *
+ * Vercel builds from a truncated clone, which is why this is needed at all: the
+ * window is 90 days and the clone holds a handful of commits, so every metric
+ * below would correctly refuse to answer. One fetch turns that into a real
+ * measurement.
+ *
+ * Best effort by design. A private repository, an offline builder or a slow
+ * remote all leave the clone as it was, and the metrics then report an em dash
+ * exactly as they would have. It must never fail a build, so it is bounded by a
+ * timeout and its errors are swallowed like every other call here.
+ */
+function deepen(): void {
+    if (git(['rev-parse', '--is-shallow-repository']) !== 'true') return;
+    git(['fetch', '--unshallow', '--quiet'], DEEPEN_TIMEOUT_MS);
 }
 
 /** `45m`, `3h 12m`, `2d 4h`. */
@@ -79,14 +144,9 @@ function median(values: number[]): number {
  * `--first-parent` counts each merge as one landing rather than counting every
  * commit the branch carried in.
  */
-function deployFrequency(ref: string, since: Date, shallow: boolean): string {
+function deployFrequency(ref: string, since: Date): string {
     const all = lines(git(['log', ref, '--first-parent', '--format=%cI']));
     if (all.length === 0) return UNKNOWN;
-
-    // A shallow clone that does not reach back past the window would report a
-    // count that is missing commits rather than one that is genuinely low.
-    const oldest = all[all.length - 1]!;
-    if (shallow && new Date(oldest).getTime() > since.getTime()) return UNKNOWN;
 
     const landed = all.filter((iso) => new Date(iso).getTime() >= since.getTime()).length;
     return `${((landed / WINDOW_DAYS) * DAYS_PER_MONTH).toFixed(1)}/mo`;
@@ -144,11 +204,21 @@ export function getDora(): Dora {
         return cached;
     }
 
+    deepen();
+
     const since = new Date(Date.now() - WINDOW_DAYS * MS_PER_DAY);
-    const shallow = isShallow();
+
+    // Both metrics measure the same window, so a history that does not cover it
+    // makes both wrong in the same way. Lead time used to be exempt from this
+    // check and reported a median over whatever a truncated fetch happened to
+    // include, which reads as a measurement rather than as a fragment of one.
+    if (!historyCoversWindow(ref, since)) {
+        cached = { deployFrequency: UNKNOWN, leadTime: UNKNOWN, ...unavailable };
+        return cached;
+    }
 
     cached = {
-        deployFrequency: deployFrequency(ref, since, shallow),
+        deployFrequency: deployFrequency(ref, since),
         leadTime: leadTime(ref, since),
         ...unavailable,
     };
