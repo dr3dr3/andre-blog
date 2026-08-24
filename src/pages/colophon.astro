@@ -1,5 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getDora } from '../lib/dora';
+
+// The footer is gated at three samples, so this is where a reader finds out how
+// many posts a figure actually rests on. See docs/METRICS.md.
+const { samples } = getDora();
+
+const posts = (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`;
+const have = (n: number) => (n === 1 ? 'has' : 'have');
 ---
 
 <BaseLayout
@@ -57,14 +65,42 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 is Route 53 in ap-southeast-2, managed by Terraform and applied by hand.
             </p>
 
-            <h2>The numbers in the footer</h2>
+            <h2 id="the-numbers-in-the-footer">The numbers in the footer</h2>
 
             <p>
-                They are the four DORA metrics, computed from this repository's git history when the
-                site is built. Two of them are real. Change failure rate and time to restore need
-                deployment outcomes the static build cannot see, so they render as an em dash and
-                keep their labels. An em dash there means the number is not available, not that it
-                is zero.
+                Four numbers, computed from this repository's git history each time the site is
+                built. They keep the shape of the DORA delivery metrics because that shape is
+                familiar, but only the first still measures software. The other three were pointed
+                at the thing this site actually produces, which is writing, and the labels say what
+                is counted rather than borrowing the original names.
+            </p>
+            <p>
+                <strong>Deploy freq</strong> counts changes landing on the main branch over the last
+                90 days, expressed per month; a design tweak and a published post each count once.
+                <strong>Draft→live</strong> is the median time a post spends between its file first
+                appearing in the repository and being published — time in the repository, not time
+                from the idea, because my notes live outside git and it cannot see when I started
+                thinking. <strong>Revised</strong> is the share of published posts that were changed
+                after they went live, counting only edits below the frontmatter, so correcting a tag
+                does not register as rewriting a paragraph. <strong>Time to revise</strong> is the
+                median wait before that first change landed, across revised posts only.
+            </p>
+            <p>
+                An em dash means the number is not available. It never means zero. Nothing is
+                estimated: where git cannot answer honestly the footer stays quiet, and if the build
+                runs against an incomplete copy of the history all four go quiet together rather
+                than measure a fragment.
+            </p>
+            <p>
+                The last three also stay quiet until they rest on at least three posts, because a
+                median of one is that one value and a median of two is the midpoint between two.
+                Right now draft→live rests on {posts(samples.draftToLive)}, revised on the {
+                    posts(samples.published)
+                } published so far, and time to revise on the {posts(samples.revised)} that {
+                    have(samples.revised)
+                } been revised.
+                The full definitions, including what is excluded and why, are in
+                <code>docs/METRICS.md</code>.
             </p>
 
             <h2>The source</h2>

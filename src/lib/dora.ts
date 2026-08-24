@@ -2,22 +2,38 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 /**
- * The four DORA metrics for the footer, computed from git history at build time.
+ * The four numbers in the site footer, computed from git history at build time.
  *
- * Two of them are real and two are not, and the line says so rather than
- * quietly dropping the labels. Change failure rate and time to restore need
- * deployment outcomes from the Vercel API, which is out of scope for v1; they
- * render as an em dash. An em dash also appears wherever git cannot answer
- * honestly — a truncated clone, a repository with no merges, no repository at
- * all. Nothing here guesses, and nothing here throws: a build must not fail
- * because a footer could not be computed.
+ * [docs/METRICS.md](../../docs/METRICS.md) is the specification; this file is
+ * only its implementation, and where the two disagree the document wins. The
+ * metrics keep the DORA shape because the audience recognises it, but only the
+ * first still measures software delivery — the other three were re-pointed at
+ * the thing this site actually produces, which is writing.
+ *
+ * Nothing here guesses and nothing here throws. A number that cannot be computed
+ * honestly renders as an em dash, which means *not available* rather than zero,
+ * and a build must never fail because a footer could not be worked out.
  */
 
 export interface Dora {
+    /** Changes landing on `main`, per month. `4.1/mo` */
     deployFrequency: string;
-    leadTime: string;
-    changeFailureRate: string;
-    timeToRestore: string;
+    /** How long a post takes from first appearing in the repository to publication. `3d 4h` */
+    draftToLive: string;
+    /** Share of published posts that needed changing afterwards. `12%` */
+    revised: string;
+    /** How long a post stood unrevised before the first change landed. `9d` */
+    timeToRevise: string;
+    /**
+     * How many posts each figure rests on, for the colophon to disclose. The
+     * footer is gated at three, so a reader needs somewhere to find out that a
+     * number rests on four posts.
+     */
+    samples: {
+        draftToLive: number;
+        published: number;
+        revised: number;
+    };
 }
 
 const UNKNOWN = '—';
@@ -25,6 +41,11 @@ const WINDOW_DAYS = 90;
 const DAYS_PER_MONTH = 30.437; // mean Gregorian month
 const MS_PER_DAY = 86_400_000;
 const DEEPEN_TIMEOUT_MS = 60_000;
+
+/** Rule 5: a median of one is the value itself and a median of two is a midpoint. */
+const SAMPLE_GATE = 3;
+
+const POSTS_DIR = 'src/content/posts';
 
 /** Run git and return trimmed stdout, or null if git fails for any reason. */
 function git(args: string[], timeout?: number): string | null {
@@ -50,10 +71,9 @@ function lines(out: string | null): string[] {
  *
  * Every git call here swallows its errors so that a footer can never fail a
  * build. That also means a footer full of em dashes looks identical whether the
- * clone was truncated, the remote was unreachable or git was absent altogether
- * — and the live footer is currently all em dashes for a reason none of those
- * calls report. The build log is the only place that distinction can surface,
- * so the decisions narrate themselves there.
+ * clone was truncated, the remote was unreachable or git was absent altogether.
+ * The build log is the only place that distinction can surface, so the decisions
+ * narrate themselves there.
  *
  * Build-time only. Nothing here reaches the page.
  */
@@ -93,46 +113,17 @@ function shallowBoundary(): Set<string> {
 }
 
 /**
- * Whether the history reachable from `ref` covers the window being measured.
- *
- * A shallow clone is not automatically untrustworthy, which is the distinction
- * this used to miss. Vercel builds from one, and a repository younger than the
- * window fits inside it whole: the oldest commit reachable is the real root,
- * nothing is missing, and the counts over the window are exact. Comparing that
- * commit's date against the window start cannot tell a young project from a
- * truncated one, so it reported every young project as unmeasurable — and would
- * have gone on doing so once the project aged past the window, because a
- * depth-limited clone does not reach back that far either.
- *
- * What actually matters is whether the oldest commit is a graft.
- */
-function historyCoversWindow(ref: string, since: Date): boolean {
-    const log = lines(git(['log', ref, '--first-parent', '--format=%H %cI']));
-    if (log.length === 0) return false;
-
-    const [sha, date] = log[log.length - 1]!.split(' ');
-    if (!sha || !date) return false;
-
-    // Reaches back past the window, so nothing inside the window is missing.
-    if (new Date(date).getTime() < since.getTime()) return true;
-
-    // Otherwise it covers the window only if it starts at the beginning of the
-    // project rather than at the point a shallow fetch stopped.
-    return !shallowBoundary().has(sha);
-}
-
-/**
  * Ask the remote for the rest of the history, when the clone has been cut short.
  *
- * Vercel builds from a truncated clone, which is why this is needed at all: the
- * window is 90 days and the clone holds a handful of commits, so every metric
- * below would correctly refuse to answer. One fetch turns that into a real
- * measurement.
+ * Vercel builds from a truncated clone, which is why this is needed at all.
+ * Metric 1 measures a trailing window and metrics 2 to 4 measure the whole
+ * archive, so between them they need every commit the project has.
  *
  * Best effort by design. A private repository, an offline builder or a slow
- * remote all leave the clone as it was, and the metrics then report an em dash
- * exactly as they would have. It must never fail a build, so it is bounded by a
- * timeout and its errors are swallowed like every other call here.
+ * remote all leave the clone as it was, and the metrics then report em dashes.
+ * It must never fail a build, so it is bounded by a timeout and its error is
+ * caught — but not silently, because an unexplained footer of em dashes is what
+ * sent us reading build logs in the first place.
  */
 function deepen(): void {
     if (git(['rev-parse', '--is-shallow-repository']) !== 'true') {
@@ -141,8 +132,7 @@ function deepen(): void {
     }
 
     // stderr is piped here, unlike every other call in this file, because the
-    // reason this particular fetch failed is the whole point of the exercise.
-    // The catch still swallows it: a footer must not fail a build.
+    // reason this particular fetch failed is the whole diagnostic.
     try {
         execFileSync('git', ['fetch', '--unshallow', '--quiet'], {
             encoding: 'utf8',
@@ -153,7 +143,9 @@ function deepen(): void {
         note('clone was truncated; fetch --unshallow landed');
     } catch (err) {
         const { stderr, message } = err as { stderr?: string; message?: string };
-        note(`clone was truncated and fetch --unshallow did not land: ${stderr?.trim() || message || String(err)}`);
+        note(
+            `clone was truncated and fetch --unshallow did not land: ${stderr?.trim() || message || String(err)}`,
+        );
     }
 }
 
@@ -166,17 +158,22 @@ function formatDuration(ms: number): string {
     return `${Math.floor(hours / 24)}d ${hours % 24}h`;
 }
 
+/** Whole days, the granularity metric 4 is specified in. `9d` */
+function formatDays(ms: number): string {
+    return `${Math.round(ms / MS_PER_DAY)}d`;
+}
+
 function median(values: number[]): number {
     const sorted = [...values].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2;
+    return sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
 }
 
 /**
- * Commits landing on main over the trailing 90 days, expressed per month.
+ * Metric 1. Changes landing on `main`, per month, over a trailing 90 days.
  *
  * `--first-parent` counts each merge as one landing rather than counting every
- * commit the branch carried in.
+ * commit the branch carried in. No sample gate: a count is not a median.
  */
 function deployFrequency(ref: string, since: Date): string {
     const all = lines(git(['log', ref, '--first-parent', '--format=%cI']));
@@ -186,77 +183,206 @@ function deployFrequency(ref: string, since: Date): string {
     return `${((landed / WINDOW_DAYS) * DAYS_PER_MONTH).toFixed(1)}/mo`;
 }
 
+/** The 1-based line of the closing frontmatter delimiter, or null if there is none. */
+function frontmatterEnd(source: string | null): number | null {
+    if (!source) return null;
+
+    const all = source.split('\n');
+    if (all[0]?.trim() !== '---') return null;
+    for (let i = 1; i < all.length; i++) {
+        if (all[i]?.trim() === '---') return i + 1;
+    }
+    return null;
+}
+
+/** One scalar out of a post's frontmatter, without a YAML parser for two fields. */
+function frontmatterField(source: string, key: string): string | null {
+    const end = frontmatterEnd(source);
+    if (end === null) return null;
+
+    for (const line of source.split('\n').slice(1, end - 1)) {
+        const match = new RegExp(`^${key}:\\s*(.+?)\\s*$`).exec(line);
+        if (match?.[1]) return match[1].replace(/^['"]|['"]$/g, '');
+    }
+    return null;
+}
+
+interface PostFacts {
+    path: string;
+    published: Date;
+    /** Author date of the commit that added the file, or null if unresolvable. */
+    startedAt: Date | null;
+    /** Date of the first revision commit after publication, or null if never revised. */
+    revisedAt: Date | null;
+}
+
 /**
- * Median time from the first commit on a branch to the merge that put it on
- * main, over the same trailing 90 days.
+ * Whether a commit revised the writing rather than the bookkeeping.
  *
- * Only merge commits can be measured this way. A repository that squashes or
- * rebases keeps no record of when the branch started, so those landings are not
- * counted; if none can be measured the metric is unknown rather than zero.
+ * A revision changes at least one line below the closing frontmatter delimiter.
+ * Bumping a tag, correcting a stack version or setting `outcome.was` is
+ * bookkeeping, and counting it would make metric 3 mean "touched again" rather
+ * than "was wrong". Body-only is a mechanical proxy for that distinction and it
+ * is not perfect — a repository-wide formatting sweep would still register. The
+ * answer if that happens is to record the exception in docs/METRICS.md, not to
+ * quietly widen this.
  */
-function leadTime(ref: string, since: Date): string {
-    const merges = lines(
-        git(['log', ref, '--first-parent', '--merges', `--since=${since.toISOString()}`, '--format=%H %cI']),
-    );
+function changesBody(sha: string, path: string): boolean {
+    const diff = git(['diff', '-U0', `${sha}^`, sha, '--', path]);
+    if (!diff) return false;
 
-    const samples: number[] = [];
-    for (const line of merges) {
-        const [sha, mergedAt] = line.split(' ');
-        if (!sha || !mergedAt) continue;
+    const after = frontmatterEnd(git(['show', `${sha}:${path}`]));
+    const before = frontmatterEnd(git(['show', `${sha}^:${path}`]));
 
-        const parents = git(['rev-list', '--parents', '-n', '1', sha])?.split(' ').slice(1) ?? [];
-        if (parents.length < 2) continue;
+    for (const line of diff.split('\n')) {
+        const hunk = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(line);
+        if (!hunk) continue;
 
-        const base = git(['merge-base', parents[0]!, parents[1]!]);
-        if (!base) continue;
+        const removedAt = Number(hunk[1]);
+        const removedCount = hunk[2] === undefined ? 1 : Number(hunk[2]);
+        const addedAt = Number(hunk[3]);
+        const addedCount = hunk[4] === undefined ? 1 : Number(hunk[4]);
 
-        // Oldest commit unique to the branch.
-        const branchCommits = lines(git(['log', `${base}..${parents[1]}`, '--format=%aI']));
-        const first = branchCommits[branchCommits.length - 1];
-        if (!first) continue;
+        if (removedCount > 0 && before !== null && removedAt > before) return true;
+        if (addedCount > 0 && after !== null && addedAt > after) return true;
+    }
+    return false;
+}
 
-        const elapsed = new Date(mergedAt).getTime() - new Date(first).getTime();
-        if (Number.isFinite(elapsed) && elapsed >= 0) samples.push(elapsed);
+/**
+ * Everything metrics 2 to 4 need about one post, or null if it is excluded.
+ *
+ * The exclusions are docs/METRICS.md's: a draft has no publication to measure
+ * from, a future-dated post has not happened yet, and a post whose `published`
+ * precedes the commit that added its file is a data error that would drag a
+ * median below zero.
+ */
+function postFacts(path: string, buildDate: Date): PostFacts | null {
+    let source: string;
+    try {
+        source = readFileSync(path, 'utf8');
+    } catch {
+        return null;
     }
 
-    return samples.length > 0 ? formatDuration(median(samples)) : UNKNOWN;
+    if (frontmatterField(source, 'draft') === 'true') return null;
+
+    const publishedRaw = frontmatterField(source, 'published');
+    if (!publishedRaw) return null;
+
+    const published = new Date(publishedRaw);
+    if (Number.isNaN(published.getTime())) return null;
+    if (published.getTime() > buildDate.getTime()) return null;
+
+    // --follow so a renamed post keeps its original start date; author date
+    // because it records when the work happened.
+    const added = lines(git(['log', '--diff-filter=A', '--follow', '--format=%aI', '--', path]));
+    const oldest = added[added.length - 1];
+    const startedAt = oldest ? new Date(oldest) : null;
+
+    // A post published before its file existed is nonsense, not a fast turnaround.
+    if (startedAt && published.getTime() < startedAt.getTime()) return null;
+
+    // The commit that set `draft: false`. publish-post.mjs does that in the same
+    // commit that stamps `published`, so the pickaxe finds it unambiguously.
+    const publishCommit = lines(
+        git(['log', '-S', 'draft: false', '--format=%H', '--reverse', '--', path]),
+    )[0];
+
+    let revisedAt: Date | null = null;
+    if (publishCommit) {
+        for (const sha of lines(
+            git(['log', '--format=%H', '--reverse', `${publishCommit}..HEAD`, '--', path]),
+        )) {
+            if (!changesBody(sha, path)) continue;
+            const when = git(['show', '-s', '--format=%cI', sha]);
+            if (when) revisedAt = new Date(when);
+            break;
+        }
+    }
+
+    return { path, published, startedAt, revisedAt };
+}
+
+/** Every post file git knows about. */
+function postPaths(): string[] {
+    return lines(git(['ls-files', POSTS_DIR])).filter(
+        (p) => p.endsWith('.mdx') || p.endsWith('.md'),
+    );
 }
 
 let cached: Dora | undefined;
 
-/** Computed once per build. Every page renders the same line. */
 export function getDora(): Dora {
     if (cached) return cached;
 
-    // Change failure rate and time to restore need deployment outcomes, which
-    // only Vercel knows. Out of scope for v1, and not something to invent.
-    const unavailable = { changeFailureRate: UNKNOWN, timeToRestore: UNKNOWN };
+    const none: Dora = {
+        deployFrequency: UNKNOWN,
+        draftToLive: UNKNOWN,
+        revised: UNKNOWN,
+        timeToRevise: UNKNOWN,
+        samples: { draftToLive: 0, published: 0, revised: 0 },
+    };
 
     const ref = mainRef();
     if (!ref) {
         note('no ref to measure; git is unavailable or this is not a repository');
-        cached = { deployFrequency: UNKNOWN, leadTime: UNKNOWN, ...unavailable };
+        cached = none;
         return cached;
     }
 
     deepen();
 
-    const since = new Date(Date.now() - WINDOW_DAYS * MS_PER_DAY);
-
-    // Both metrics measure the same window, so a history that does not cover it
-    // makes both wrong in the same way. Lead time used to be exempt from this
-    // check and reported a median over whatever a truncated fetch happened to
-    // include, which reads as a measurement rather than as a fragment of one.
-    if (!historyCoversWindow(ref, since)) {
-        note(`history does not cover the trailing ${WINDOW_DAYS} days; deploy freq and lead time report em dashes`);
-        cached = { deployFrequency: UNKNOWN, leadTime: UNKNOWN, ...unavailable };
+    // Rule 4. Metric 1 measures a trailing window and metrics 2 to 4 measure the
+    // whole archive, so a history that stops early makes every one of them a
+    // fragment presented as a measurement. A graft is what distinguishes a
+    // truncated clone from a genuinely young project.
+    if (shallowBoundary().size > 0) {
+        note('history is still truncated after the fetch; all four metrics report em dashes');
+        cached = none;
         return cached;
     }
 
+    const buildDate = new Date();
+    const since = new Date(buildDate.getTime() - WINDOW_DAYS * MS_PER_DAY);
+
+    const posts = postPaths()
+        .map((path) => postFacts(path, buildDate))
+        .filter((p): p is PostFacts => p !== null);
+
+    // Metric 2. Every published post, all time — the corpus is a question about
+    // the whole body of work rather than about now. Posts whose start commit
+    // cannot be resolved are excluded from this metric only.
+    const started = posts.filter((p) => p.startedAt !== null);
+    const draftToLive = started.map((p) => p.published.getTime() - p.startedAt!.getTime());
+
+    // Metric 3. Denominator every published post, numerator those revised.
+    const revisedPosts = posts.filter((p) => p.revisedAt !== null);
+
+    // Metric 4. Revised posts only. With none it is an em dash, never zero.
+    const timeToRevise = revisedPosts.map((p) => p.revisedAt!.getTime() - p.published.getTime());
+
+    const samples = {
+        draftToLive: draftToLive.length,
+        published: posts.length,
+        revised: revisedPosts.length,
+    };
+
+    note(
+        `samples — draft→live ${samples.draftToLive}, published ${samples.published}, ` +
+            `revised ${samples.revised}; gate is ${SAMPLE_GATE}`,
+    );
+
     cached = {
         deployFrequency: deployFrequency(ref, since),
-        leadTime: leadTime(ref, since),
-        ...unavailable,
+        draftToLive:
+            draftToLive.length >= SAMPLE_GATE ? formatDuration(median(draftToLive)) : UNKNOWN,
+        revised:
+            posts.length >= SAMPLE_GATE
+                ? `${Math.round((revisedPosts.length / posts.length) * 100)}%`
+                : UNKNOWN,
+        timeToRevise: timeToRevise.length >= SAMPLE_GATE ? formatDays(median(timeToRevise)) : UNKNOWN,
+        samples,
     };
     return cached;
 }
