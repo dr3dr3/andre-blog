@@ -15,6 +15,12 @@ import { readFileSync } from 'node:fs';
  * and a build must never fail because a footer could not be worked out.
  */
 
+export interface PostSamples {
+    draftToLive: number;
+    published: number;
+    revised: number;
+}
+
 export interface Dora {
     /** Changes landing on `main`, per month. `4.1/mo` */
     deployFrequency: string;
@@ -28,12 +34,13 @@ export interface Dora {
      * How many posts each figure rests on, for the colophon to disclose. The
      * footer is gated at three, so a reader needs somewhere to find out that a
      * number rests on four posts.
+     *
+     * Null when the archive could not be read at all. Zero would be a claim —
+     * that there are no published posts — and rule 2 of docs/METRICS.md is that
+     * an unavailable number never renders as zero. That applies to the counts
+     * behind the figures exactly as it applies to the figures.
      */
-    samples: {
-        draftToLive: number;
-        published: number;
-        revised: number;
-    };
+    samples: PostSamples | null;
 }
 
 const UNKNOWN = '—';
@@ -321,7 +328,7 @@ export function getDora(): Dora {
         draftToLive: UNKNOWN,
         revised: UNKNOWN,
         timeToRevise: UNKNOWN,
-        samples: { draftToLive: 0, published: 0, revised: 0 },
+        samples: null,
     };
 
     const ref = mainRef();
