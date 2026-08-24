@@ -46,6 +46,22 @@ function lines(out: string | null): string[] {
 }
 
 /**
+ * One line of build-time diagnostics, on stderr.
+ *
+ * Every git call here swallows its errors so that a footer can never fail a
+ * build. That also means a footer full of em dashes looks identical whether the
+ * clone was truncated, the remote was unreachable or git was absent altogether
+ * — and the live footer is currently all em dashes for a reason none of those
+ * calls report. The build log is the only place that distinction can surface,
+ * so the decisions narrate themselves there.
+ *
+ * Build-time only. Nothing here reaches the page.
+ */
+function note(message: string): void {
+    console.warn(`[dora] ${message}`);
+}
+
+/**
  * The ref that stands in for `main`. A local branch when one exists, the remote
  * branch when the clone is detached (which is how Vercel checks out a build),
  * and HEAD as a last resort.
@@ -119,8 +135,26 @@ function historyCoversWindow(ref: string, since: Date): boolean {
  * timeout and its errors are swallowed like every other call here.
  */
 function deepen(): void {
-    if (git(['rev-parse', '--is-shallow-repository']) !== 'true') return;
-    git(['fetch', '--unshallow', '--quiet'], DEEPEN_TIMEOUT_MS);
+    if (git(['rev-parse', '--is-shallow-repository']) !== 'true') {
+        note('clone is not shallow; no fetch needed');
+        return;
+    }
+
+    // stderr is piped here, unlike every other call in this file, because the
+    // reason this particular fetch failed is the whole point of the exercise.
+    // The catch still swallows it: a footer must not fail a build.
+    try {
+        execFileSync('git', ['fetch', '--unshallow', '--quiet'], {
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'pipe'],
+            cwd: process.cwd(),
+            timeout: DEEPEN_TIMEOUT_MS,
+        });
+        note('clone was truncated; fetch --unshallow landed');
+    } catch (err) {
+        const { stderr, message } = err as { stderr?: string; message?: string };
+        note(`clone was truncated and fetch --unshallow did not land: ${stderr?.trim() || message || String(err)}`);
+    }
 }
 
 /** `45m`, `3h 12m`, `2d 4h`. */
@@ -200,6 +234,7 @@ export function getDora(): Dora {
 
     const ref = mainRef();
     if (!ref) {
+        note('no ref to measure; git is unavailable or this is not a repository');
         cached = { deployFrequency: UNKNOWN, leadTime: UNKNOWN, ...unavailable };
         return cached;
     }
@@ -213,6 +248,7 @@ export function getDora(): Dora {
     // check and reported a median over whatever a truncated fetch happened to
     // include, which reads as a measurement rather than as a fragment of one.
     if (!historyCoversWindow(ref, since)) {
+        note(`history does not cover the trailing ${WINDOW_DAYS} days; deploy freq and lead time report em dashes`);
         cached = { deployFrequency: UNKNOWN, leadTime: UNKNOWN, ...unavailable };
         return cached;
     }
