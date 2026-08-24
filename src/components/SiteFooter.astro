@@ -2,15 +2,17 @@
 import { getDora } from '../lib/dora';
 
 // Computed from git history at build time. An em dash means the number is not
-// available, not that it is zero. See src/lib/dora.ts.
+// available, not that it is zero — and metrics 2 to 4 stay quiet until they rest
+// on three posts. docs/METRICS.md is the specification; src/lib/dora.ts
+// implements it, and /colophon explains it to readers.
 const dora = getDora();
 ---
 
 <footer class="site-footer">
     <p>
-        deploy freq {dora.deployFrequency} · lead time {dora.leadTime} · change fail {
-            dora.changeFailureRate
-        } · mttr {dora.timeToRestore}
+        deploy freq {dora.deployFrequency} · draft→live {dora.draftToLive} · revised {
+            dora.revised
+        } · time to revise {dora.timeToRevise}
     </p>
     <p><a href="/colophon">Colophon</a></p>
 </footer>
