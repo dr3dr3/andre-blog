@@ -50,3 +50,7 @@ HANDOVER.md
 # detail and unscrubbed artefacts. Never committed. See docs/WRITING.md §8.
 drafts/*
 !drafts/README.md
+
+# André's personal AI setup (dotfiles for AI), cloned here for reference only.
+# It has its own repo: https://github.com/dr3dr3/dotai
+dotai/
