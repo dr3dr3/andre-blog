@@ -47,13 +47,13 @@ is for. It does mean the figure can be healthy in a month with no new posts.
 
 ## 2. Lead time
 
-**Label:** `draft→live` **Format:** `3d 4h`
+**Label:** `draft→live` **Format:** `3d`
 
 How long a post takes to get from its first appearance in the repository to being published.
 
 | | |
 | --- | --- |
-| Per post | `published` − author date of the commit that added the post file |
+| Per post | `published` − author date of the commit that added the post file, as whole calendar days in UTC |
 | Aggregate | median across qualifying posts |
 | Window | every published post, all time |
 | Sample gate | 3 posts |
@@ -61,6 +61,11 @@ How long a post takes to get from its first appearance in the repository to bein
 The starting commit is found with `--diff-filter=A --follow`, so a renamed post keeps its original
 start date. Author date rather than committer date, because it records when the work happened; the
 repository never rewrites history, so in practice the two agree.
+
+**Whole days, not hours.** `published` is a date with no time. Subtracting a commit timestamp from
+it would report `2d 19h` for a post whose two dates are three days apart, claiming a precision the
+field does not have — and would make a post written and published on the same day come out negative,
+so the impossible-dates exclusion below would silently discard it. Only the dates are compared.
 
 **What it can honestly claim.** Brain-dumps live in `drafts/`, which is gitignored — git cannot see
 when André started thinking about a post, only when a file for it was committed. So this measures
@@ -111,7 +116,7 @@ How long a post stood in its unrevised form before the first change landed.
 
 | | |
 | --- | --- |
-| Per post | date of first revision commit − `published` |
+| Per post | date of first revision commit − `published`, as whole calendar days in UTC |
 | Aggregate | median |
 | Denominator | **revised posts only**, not all published posts |
 | Sample gate | 3 revised posts |
@@ -129,9 +134,10 @@ Applied to metrics 2, 3 and 4. Metric 1 counts commits and is unaffected.
 
 - **Drafts.** `draft: true` is not published and has no publish date to measure from.
 - **Future-dated posts.** `published` later than the build date.
-- **Posts with impossible dates.** Any post whose `published` precedes the commit that added its
-  file. This is a data error rather than a fast turnaround, and it produces a negative interval that
-  would drag a median below zero. It exists today: `placeholder-six-agents.mdx` carries
+- **Posts with impossible dates.** Any post whose `published` *date* precedes the date of the commit
+  that added its file. This is a data error rather than a fast turnaround, and it produces a negative
+  interval that would drag a median below zero. A post added and published on the same day is zero
+  days, not negative, and counts. It exists today: `placeholder-six-agents.mdx` carries
   `published: 2026-06-18` but its file first appears in git on 2026-08-08. That post is being
   deleted, but the guard stays — a defensive rule costs nothing and this is exactly the class of
   silent nonsense rule 1 exists to prevent.
@@ -154,11 +160,15 @@ The colophon section should carry, in prose rather than a table:
 - the sample sizes behind each figure — the footer is gated at three, so the page is where a reader
   finds out a number rests on four posts
 
-Linking the footer line to `/colophon#the-numbers-in-the-footer` would make that discoverable
-without adding chrome. That is the one open decision here; everything above is settled.
+**Settled: the footer line links to `/colophon#the-numbers-in-the-footer`.** It keeps the line's own
+colour and weight and only resolves into a link on hover or focus, so the discoverability arrives
+without the chrome.
 
 ## Open knobs
 
+- **Whole days rather than hours.** Chosen because `published` carries no time, so any finer figure
+  would be precision the data does not have. It costs the ability to distinguish a post published
+  the morning after it was started from one published that evening; both read `1d`.
 - **The sample gate is three.** Chosen because a median of one is the value itself and a median of
   two is the midpoint of two — neither is a distribution. It is a judgement call, not a derivation.
 - **Window asymmetry.** Metric 1 uses a trailing 90 days; metrics 2–4 use every published post.

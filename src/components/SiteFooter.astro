@@ -9,10 +9,12 @@ const dora = getDora();
 ---
 
 <footer class="site-footer">
-    <p>
-        deploy freq {dora.deployFrequency} · draft→live {dora.draftToLive} · revised {
-            dora.revised
-        } · time to revise {dora.timeToRevise}
+    <p class="metrics">
+        <a href="/colophon#the-numbers-in-the-footer">
+            deploy freq {dora.deployFrequency} · draft→live {dora.draftToLive} · revised {
+                dora.revised
+            } · time to revise {dora.timeToRevise}
+        </a>
     </p>
     <p><a href="/colophon">Colophon</a></p>
 </footer>

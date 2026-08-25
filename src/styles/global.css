@@ -221,6 +221,20 @@ main {
     color: var(--faint);
 }
 
+/* The metrics line links to the colophon section that defines it. docs/METRICS.md
+   asks for that link without adding chrome, so it keeps the line's own colour and
+   only resolves into a link on hover or focus. */
+.site-footer .metrics a {
+    color: inherit;
+    text-decoration-color: var(--rule);
+}
+
+.site-footer .metrics a:hover,
+.site-footer .metrics a:focus-visible {
+    color: var(--info);
+    text-decoration-color: currentColor;
+}
+
 /* The reset zeroes paragraph margins, and the footer has no `> * + *` rule. */
 .site-footer p + p {
     margin-top: 0.4rem;

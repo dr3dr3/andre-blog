@@ -24,7 +24,7 @@ export interface PostSamples {
 export interface Dora {
     /** Changes landing on `main`, per month. `4.1/mo` */
     deployFrequency: string;
-    /** How long a post takes from first appearing in the repository to publication. `3d 4h` */
+    /** How long a post takes from first appearing in the repository to publication. `3d` */
     draftToLive: string;
     /** Share of published posts that needed changing afterwards. `12%` */
     revised: string;
@@ -156,18 +156,24 @@ function deepen(): void {
     }
 }
 
-/** `45m`, `3h 12m`, `2d 4h`. */
-function formatDuration(ms: number): string {
-    const minutes = Math.round(ms / 60_000);
-    if (minutes < 60) return `${minutes}m`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ${minutes % 60}m`;
-    return `${Math.floor(hours / 24)}d ${hours % 24}h`;
+/**
+ * Whole days between two calendar dates, in UTC.
+ *
+ * Both metrics that use this span a `published` date and a commit timestamp.
+ * `published` carries no time, so subtracting a timestamp from it would claim a
+ * precision the field does not have — and would make a post written and
+ * published on the same day come out negative, which the impossible-dates
+ * exclusion would then throw away as a data error. Comparing the dates alone
+ * says exactly what is known and no more.
+ */
+function daysBetween(from: Date, to: Date): number {
+    const midnight = (d: Date) => Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    return Math.round((midnight(to) - midnight(from)) / MS_PER_DAY);
 }
 
-/** Whole days, the granularity metric 4 is specified in. `9d` */
-function formatDays(ms: number): string {
-    return `${Math.round(ms / MS_PER_DAY)}d`;
+/** `3d`, the granularity metrics 2 and 4 are specified in. */
+function formatDays(days: number): string {
+    return `${Math.round(days)}d`;
 }
 
 function median(values: number[]): number {
@@ -288,7 +294,8 @@ function postFacts(path: string, buildDate: Date): PostFacts | null {
     const startedAt = oldest ? new Date(oldest) : null;
 
     // A post published before its file existed is nonsense, not a fast turnaround.
-    if (startedAt && published.getTime() < startedAt.getTime()) return null;
+    // Same day is zero rather than negative, and counts.
+    if (startedAt && daysBetween(startedAt, published) < 0) return null;
 
     // The commit that set `draft: false`. publish-post.mjs does that in the same
     // commit that stamps `published`, so the pickaxe finds it unambiguously.
@@ -361,13 +368,13 @@ export function getDora(): Dora {
     // the whole body of work rather than about now. Posts whose start commit
     // cannot be resolved are excluded from this metric only.
     const started = posts.filter((p) => p.startedAt !== null);
-    const draftToLive = started.map((p) => p.published.getTime() - p.startedAt!.getTime());
+    const draftToLive = started.map((p) => daysBetween(p.startedAt!, p.published));
 
     // Metric 3. Denominator every published post, numerator those revised.
     const revisedPosts = posts.filter((p) => p.revisedAt !== null);
 
     // Metric 4. Revised posts only. With none it is an em dash, never zero.
-    const timeToRevise = revisedPosts.map((p) => p.revisedAt!.getTime() - p.published.getTime());
+    const timeToRevise = revisedPosts.map((p) => daysBetween(p.published, p.revisedAt!));
 
     const samples = {
         draftToLive: draftToLive.length,
@@ -382,8 +389,7 @@ export function getDora(): Dora {
 
     cached = {
         deployFrequency: deployFrequency(ref, since),
-        draftToLive:
-            draftToLive.length >= SAMPLE_GATE ? formatDuration(median(draftToLive)) : UNKNOWN,
+        draftToLive: draftToLive.length >= SAMPLE_GATE ? formatDays(median(draftToLive)) : UNKNOWN,
         revised:
             posts.length >= SAMPLE_GATE
                 ? `${Math.round((revisedPosts.length / posts.length) * 100)}%`
