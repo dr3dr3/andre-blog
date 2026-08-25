@@ -221,12 +221,14 @@ main {
     color: var(--faint);
 }
 
-/* The metrics line links to the colophon section that defines it. docs/METRICS.md
-   asks for that link without adding chrome, so it keeps the line's own colour and
-   only resolves into a link on hover or focus. */
+/* The metrics line links to the colophon section that defines it. It keeps the
+   line's own faint colour rather than taking the link colour, so the footer does
+   not gain a line of blue — but it stays underlined in that colour, because a
+   link that only announces itself on hover announces itself to nobody on a
+   touchscreen. --rule sits at 1.29:1 against the paper and was invisible. */
 .site-footer .metrics a {
     color: inherit;
-    text-decoration-color: var(--rule);
+    text-decoration-color: currentColor;
 }
 
 .site-footer .metrics a:hover,
