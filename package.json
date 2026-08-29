@@ -16,7 +16,7 @@
         "publish-post": "node scripts/publish-post.mjs"
     },
     "dependencies": {
-        "@astrojs/mdx": "^7.0.7",
+        "@astrojs/mdx": "^7.0.8",
         "@astrojs/sitemap": "^3.7.3",
         "@vercel/analytics": "^2.0.1",
         "astro": "^7.2.4"
