@@ -46,7 +46,10 @@
     --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
 
-    --fs-body: 1.0625rem; /* 17px, lifted to 18px at wider viewports */
+    /* The scale steps up twice with the viewport; see the two queries at the
+     * foot of this file. Every step is set here rather than on `body` so a
+     * rule can read --fs-body and get the value that is actually rendering. */
+    --fs-body: 1.0625rem; /* 17px */
     --fs-utility: 0.71875rem; /* 11.5px — metadata, dates, tags, footer */
     --fs-index-title: 1.25rem; /* 20px */
     --fs-post-title: 1.625rem; /* 26px */
@@ -74,5 +77,36 @@
         --info: #84aecf;
         --warn: #c68b52;
         --bad: #d9938b;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * Viewport steps.
+ *
+ * `ch` is the width of a zero, and Newsreader's zero is wider than its average
+ * lowercase glyph: the index summary wraps at 89 characters on a 62ch column,
+ * where a line wants 45-75. So the step up raises the type and trims the
+ * measure together. The column still grows, the line comes back to about 80
+ * characters, and the text stops reading as small on a large display.
+ *
+ * The block is not made wider than this. A prose column that fills a 2500px
+ * viewport is unreadable; the horizontal space is the margin, and the answer
+ * to an empty one is structure, not a longer line.
+ * ------------------------------------------------------------------------ */
+
+@media (min-width: 40rem) {
+    :root {
+        --fs-body: 1.125rem; /* 18px */
+    }
+}
+
+@media (min-width: 90rem) {
+    :root {
+        --fs-body: 1.3125rem; /* 21px */
+        --fs-utility: 0.78125rem; /* 12.5px */
+        --fs-index-title: 1.625rem; /* 26px */
+        --fs-post-title: 2.125rem; /* 34px */
+        --measure: 56ch;
+        --label-col: 84px;
     }
 }

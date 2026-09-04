@@ -82,12 +82,27 @@ thresholds, which is not worth doing while two of the four metrics render as an 
 
 ## Type
 
-| Role | Face | Size | Notes |
-| --- | --- | --- | --- |
-| Post title | JetBrains Mono 500 | 26px | tracking `-0.025em` |
-| Index title | JetBrains Mono 500 | 20px | tracking `-0.025em` |
-| Body | Newsreader (variable) | 17px, 18px ≥ 40rem | line-height 1.7, optical sizing auto |
-| Utility | JetBrains Mono | 11.5px | metadata, dates, tags, footer |
+| Role | Face | Size | ≥ 90rem | Notes |
+| --- | --- | --- | --- | --- |
+| Post title | JetBrains Mono 500 | 26px | 34px | tracking `-0.025em` |
+| Index title | JetBrains Mono 500 | 20px | 26px | tracking `-0.025em` |
+| Body | Newsreader (variable) | 17px, 18px ≥ 40rem | 21px | line-height 1.7, optical sizing auto |
+| Utility | JetBrains Mono | 11.5px | 12.5px | metadata, dates, tags, footer |
+
+The scale steps twice, at 40rem and at 90rem, and every step is set as a token rather than on
+`body`, so a rule that reads `--fs-body` gets the value actually rendering. The second step exists
+because 18px in a 62ch column reads as a stamp on a large display — a real complaint, from a 4K
+monitor at 100% zoom.
+
+It moves the measure at the same time. `ch` is the width of a zero, and Newsreader's zero is wider
+than its average lowercase glyph, so a 62ch column wraps prose at 89 characters — measured off the
+rendered index — where a line wants 45 to 75. Raising the type alone would have widened the column
+and left the line just as long, so the measure drops to 56ch in the same step: the column still
+grows, and the line comes back to about 80 characters.
+
+The column is not widened beyond that, and the horizontal space left over is not a defect. A prose
+column that fills a 2500px viewport is unreadable. The answer to an empty margin is structure, not
+a longer line.
 
 Titles set in the mono face is deliberate and central to the identity, not a placeholder.
 
@@ -97,7 +112,7 @@ Both are licensed under the SIL Open Font License; the licence texts sit next to
 
 ## Layout
 
-Single column, left-aligned, centred in the viewport, measure capped at `62ch`. No sidebar, no
+Single column, left-aligned, centred in the viewport, measure capped at `62ch` — `56ch` at `90rem` and above, where the type is larger. No sidebar, no
 cards, no hero images, no featured post. Header is the name on the left and text links on the
 right, separated by a hairline. Responsive floor is 380px.
 

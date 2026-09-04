@@ -111,12 +111,6 @@ body {
     padding: 0 var(--gutter) 4rem;
 }
 
-@media (min-width: 40rem) {
-    body {
-        font-size: 1.125rem;
-    }
-}
-
 .site-header,
 main,
 .site-footer {
