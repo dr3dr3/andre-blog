@@ -11,14 +11,12 @@ const posts = await getPosts();
 <BaseLayout
     title="André Dreyer"
     description="Notes on platform engineering, AI agents and the systems around them."
+    masthead
 >
-    <h1 class="visually-hidden">Posts</h1>
     <ul class="post-index">
         {
             posts.map((post) => (
                 <li>
-                    <a href={`/posts/${post.id}/`}>{post.data.title}</a>
-                    <p class="summary">{post.data.summary}</p>
                     <p class="index-meta">
                         <time datetime={isoDate(post.data.published)}>{isoDate(post.data.published)}</time>
                         <span class="sep"> · </span>
@@ -28,6 +26,8 @@ const posts = await getPosts();
                             changed={post.data.outcome.changed}
                         />
                     </p>
+                    <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+                    <p class="summary">{post.data.summary}</p>
                 </li>
             ))
         }

@@ -1,20 +1,39 @@
 ---
-import { getDora } from '../lib/dora';
+import { getDora, UNKNOWN } from '../lib/dora';
 
 // Computed from git history at build time. An em dash means the number is not
 // available, not that it is zero — and metrics 2 to 4 stay quiet until they rest
 // on three posts. docs/METRICS.md is the specification; src/lib/dora.ts
 // implements it, and /colophon explains it to readers.
 const dora = getDora();
+
+// The labels are the ones METRICS.md specifies; the caps are CSS, so the
+// specification and the markup still read the same. A value that came back as
+// an em dash is toned down rather than set in ink: three unavailable numbers in
+// full contrast would read as the loudest thing in the footer, which is the
+// opposite of what an em dash means.
+const metrics = [
+    { label: 'deploy freq', value: dora.deployFrequency },
+    { label: 'draft→live', value: dora.draftToLive },
+    { label: 'revised', value: dora.revised },
+    { label: 'time to revise', value: dora.timeToRevise },
+];
 ---
 
 <footer class="site-footer">
-    <p class="metrics">
-        <a href="/colophon#the-numbers-in-the-footer">
-            deploy freq {dora.deployFrequency} · draft→live {dora.draftToLive} · revised {
-                dora.revised
-            } · time to revise {dora.timeToRevise}
-        </a>
+    <dl class="metrics">
+        {
+            metrics.map(({ label, value }) => (
+                <div>
+                    <dt>{label}</dt>
+                    <dd class:list={[value === UNKNOWN && 'metric-unknown']}>{value}</dd>
+                </div>
+            ))
+        }
+    </dl>
+    <p class="metrics-note">
+        <a href="/colophon#the-numbers-in-the-footer">What these count</a>
+        <span class="sep"> · </span>
+        <a href="/colophon">Colophon</a>
     </p>
-    <p><a href="/colophon">Colophon</a></p>
 </footer>

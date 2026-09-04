@@ -77,17 +77,40 @@ carried: one token was both "this is clickable" and "this shipped", so neither r
 learned. A `still-running` status never sits inline with a link, and links are underlined.
 
 Two extensions are deliberately deferred rather than rejected: colouring the DORA footer against its
-thresholds, which is not worth doing while two of the four metrics render as an em dash, and a
+thresholds, which is not worth doing while three of the four metrics render as an em dash, and a
 `severity` value beyond `failure`.
+
+The metrics strip does take one tone decision: a value that came back as an em dash is set in
+`--faint` rather than `--ink`. It is not a status colour and carries no meaning of its own — it is
+the absence of a value stepping back from four values in full contrast. Three of the four will be
+em dashes until the site has three posts, and a strip that shouted its own missing numbers would be
+worse than the run-on line it replaced.
 
 ## Type
 
-| Role | Face | Size | Notes |
-| --- | --- | --- | --- |
-| Post title | JetBrains Mono 500 | 26px | tracking `-0.025em` |
-| Index title | JetBrains Mono 500 | 20px | tracking `-0.025em` |
-| Body | Newsreader (variable) | 17px, 18px ≥ 40rem | line-height 1.7, optical sizing auto |
-| Utility | JetBrains Mono | 11.5px | metadata, dates, tags, footer |
+| Role | Face | Size | ≥ 90rem | Notes |
+| --- | --- | --- | --- | --- |
+| Masthead | JetBrains Mono 500 | 28px | 40px | home page only, tracking `-0.035em` |
+| Post title | JetBrains Mono 500 | 26px | 34px | tracking `-0.025em` |
+| Index title | JetBrains Mono 500 | 20px | 28px | tracking `-0.025em` |
+| Body | Newsreader (variable) | 17px, 18px ≥ 40rem | 21px | line-height 1.7, optical sizing auto |
+| Metric value | JetBrains Mono 500 | 16px | 18px | the four footer numbers, tracking `-0.02em` |
+| Utility | JetBrains Mono | 11.5px | 12.5px | metadata, dates, tags, footer |
+
+The scale steps twice, at 40rem and at 90rem, and every step is set as a token rather than on
+`body`, so a rule that reads `--fs-body` gets the value actually rendering. The second step exists
+because 18px in a 62ch column reads as a stamp on a large display — a real complaint, from a 4K
+monitor at 100% zoom.
+
+It moves the measure at the same time. `ch` is the width of a zero, and Newsreader's zero is wider
+than its average lowercase glyph, so a 62ch column wraps prose at 89 characters — measured off the
+rendered index — where a line wants 45 to 75. Raising the type alone would have widened the column
+and left the line just as long, so the measure drops to 56ch in the same step: the column still
+grows, and the line comes back to about 80 characters.
+
+The column is not widened beyond that, and the horizontal space left over is not a defect. A prose
+column that fills a 2500px viewport is unreadable. The answer to an empty margin is structure, not
+a longer line.
 
 Titles set in the mono face is deliberate and central to the identity, not a placeholder.
 
@@ -97,9 +120,29 @@ Both are licensed under the SIL Open Font License; the licence texts sit next to
 
 ## Layout
 
-Single column, left-aligned, centred in the viewport, measure capped at `62ch`. No sidebar, no
-cards, no hero images, no featured post. Header is the name on the left and text links on the
-right, separated by a hairline. Responsive floor is 380px.
+Single column, left-aligned, centred in the viewport, measure capped at `62ch` — `56ch` at `90rem` and above, where the type is larger. No sidebar, no
+cards, no hero images, no featured post. Responsive floor is 380px.
+
+The header has two forms. Everywhere except the home page it is the compact one: the name on the
+left, text links on the right, a hairline under it. The home page gets the **masthead** — the name
+set at `--fs-masthead`, the page's own description on the line beneath it, then the nav, stacked and
+flush left. Nothing else changes. The compact header had the site name at 15px, smaller than the
+post title under it, which reads as a breadcrumb rather than a title page; a masthead on a post page
+would have the opposite problem and compete with the title, so `BaseLayout` takes a `masthead` prop
+and only `index.astro` passes it. The description is rendered from the same prop that sets the meta
+description, so the visible line and the one search results show cannot drift apart.
+
+## The label register
+
+Two places set utility type in caps with `0.06`–`0.08em` of tracking: the kicker above an index
+entry (date · outcome), and the labels in the footer's metrics strip. Nothing else on the site is
+uppercase, and the register means one thing — *this names the thing under it*. The words are
+lowercase in the markup and capitalised in CSS, so `deploy freq` still reads as `deploy freq` in the
+source and in [METRICS.md](METRICS.md).
+
+The index kicker moved above the title rather than below the summary as part of this. An entry then
+reads label, title, summary — three sizes descending — instead of two body-sized blocks with a
+footnote.
 
 ## The tone scale, and why it moved
 
