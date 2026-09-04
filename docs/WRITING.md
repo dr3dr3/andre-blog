@@ -142,6 +142,18 @@ Rules for artefacts:
 - Scrub them. See §8.
 - The caption says what it is and where it came from.
 
+Captions are numbered by the stylesheet — the first captioned artefact in a post renders as
+`ARTEFACT 1 · …`, and so on. Nothing in the MDX carries the number, so artefacts can be reordered
+freely. An artefact with no caption takes no number. The prose may refer to one by number, but does
+not have to and mostly should not: the caption is there so the artefact reads on its own.
+
+### The scene break
+
+A post can mark a turn inside a section with a thematic break — `***` on its own line in the MDX,
+which renders as a centred row of middle dots. It is for the paragraph that changes direction where
+a heading would be too heavy and a blank line does nothing. Use it sparingly: more than one or two
+in a post and the sections were the wrong shape to begin with.
+
 ---
 
 ## 8. Anonymisation

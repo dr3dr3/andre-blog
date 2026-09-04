@@ -112,5 +112,6 @@
         --fs-metric: 1.125rem; /* 18px */
         --measure: 56ch;
         --label-col: 84px;
+        --numeral-col: 5.75rem; /* section numerals, in the margin beside an h2 */
     }
 }
