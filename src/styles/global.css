@@ -332,12 +332,25 @@ main {
  * label register as the footer strip; the outcome keeps its own status colour
  * on top of this one. */
 .index-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
     font-family: var(--mono);
     font-size: var(--fs-utility);
     line-height: 1.6;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--faint);
+}
+
+/* The hairline runs from the end of the label to the edge of the measure. It is
+ * the one thing on the index that makes a list of one entry look composed
+ * rather than sparse, which is the state this site will be in for a while. */
+.index-meta::after {
+    content: '';
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--rule);
 }
 
 /* ---------------------------------------------------------------------------
@@ -373,6 +386,88 @@ h1 {
 
 .prose > * + * {
     margin-top: 1.25rem;
+}
+
+/* Both counters are instantiated here, on the one .prose per page. */
+.prose {
+    counter-reset: section artefact;
+}
+
+.prose h2 {
+    counter-increment: section;
+}
+
+/* Numbered sections, in the margin. Only at the step where the margin is empty
+ * anyway — below it there is nowhere to put a numeral that is not the measure.
+ *
+ * The heading becomes a flex line whose first item is the numeral, and the whole
+ * line is pulled left by the width of that column, so the heading text lands
+ * exactly where it did before. `align-items: baseline` is doing the work that
+ * would otherwise be a magic pixel offset: the numeral is 12.5px against the
+ * heading's 17px, and the browser sits them on the same baseline.
+ *
+ * Plain digits, no section sign: `§` is a citation mark, and nothing here cites
+ * a section. */
+@media (min-width: 90rem) {
+    .prose h2 {
+        display: flex;
+        align-items: baseline;
+        gap: 1.25rem;
+        margin-left: calc(-1 * var(--numeral-col));
+    }
+
+    .prose h2::before {
+        content: counter(section, decimal-leading-zero);
+        flex: 0 0 calc(var(--numeral-col) - 1.25rem);
+        text-align: right;
+        font-size: var(--fs-utility);
+        letter-spacing: 0.06em;
+        color: var(--faint);
+    }
+}
+
+/* Scene break — the turn inside a section, where a heading is too much and a
+ * blank line is nothing. Written as a thematic break (`***`) in the MDX.
+ *
+ * Middle dots rather than an asterism (⁂): the dot is in the latin subset the
+ * fonts are built from, and a glyph missing from a subset falls back to a system
+ * face in the middle of the page. The trailing letter-space is pushed back by an
+ * equal text-indent, so the row is actually centred. */
+.prose hr {
+    border: 0;
+    overflow: visible;
+    margin: 2.25rem 0;
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    letter-spacing: 1.1em;
+    text-indent: 1.1em;
+    text-align: center;
+    color: var(--faint);
+}
+
+.prose hr::before {
+    content: '· · ·';
+}
+
+/* Links in prose keep the browser's underline at rest — descender-aware, and it
+ * survives forced-colours and print, which a background gradient does not. The
+ * flourish is additive: an ink rule draws in under it, left to right, and the
+ * text goes to ink with it. Under prefers-reduced-motion the global rule at the
+ * top of this file collapses the transition, so the rule simply appears. */
+.prose a {
+    background-image: linear-gradient(var(--ink), var(--ink));
+    background-size: 0 2px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: background-size 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.prose a:hover,
+.prose a:focus-visible {
+    color: var(--ink);
+    background-size: 100% 2px;
 }
 
 .prose ul,
@@ -550,11 +645,22 @@ h1 {
 }
 
 .artefact figcaption {
+    counter-increment: artefact;
     margin-top: 0.5rem;
     font-family: var(--mono);
     font-size: var(--fs-utility);
     line-height: 1.5;
     color: var(--faint);
+}
+
+/* The counter is incremented by the caption rather than the figure, so an
+ * artefact that carries no caption does not consume a number and leave a gap in
+ * the sequence. Same label register as the index kicker and the metrics strip. */
+.artefact figcaption::before {
+    content: 'Artefact ' counter(artefact) ' · ';
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
 }
 
 /* ---------------------------------------------------------------------------

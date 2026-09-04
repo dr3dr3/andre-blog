@@ -28,13 +28,18 @@ const { tag, posts } = Astro.props;
             posts.map((post) => (
                 <li>
                     <p class="index-meta">
-                        <time datetime={isoDate(post.data.published)}>{isoDate(post.data.published)}</time>
-                        <span class="sep"> · </span>
-                        <Outcome
-                            status={post.data.outcome.status}
-                            was={post.data.outcome.was}
-                            changed={post.data.outcome.changed}
-                        />
+                        {/* The rule after the label is a flex child of this <p>, so the
+                            label itself is wrapped: without it every inline here would
+                            become a flex item and the spacing between them would go. */}
+                        <span>
+                            <time datetime={isoDate(post.data.published)}>{isoDate(post.data.published)}</time>
+                            <span class="sep"> · </span>
+                            <Outcome
+                                status={post.data.outcome.status}
+                                was={post.data.outcome.was}
+                                changed={post.data.outcome.changed}
+                            />
+                        </span>
                     </p>
                     <a href={`/posts/${post.id}/`}>{post.data.title}</a>
                     <p class="summary">{post.data.summary}</p>

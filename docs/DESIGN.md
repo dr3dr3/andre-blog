@@ -142,7 +142,32 @@ source and in [METRICS.md](METRICS.md).
 
 The index kicker moved above the title rather than below the summary as part of this. An entry then
 reads label, title, summary — three sizes descending — instead of two body-sized blocks with a
-footnote.
+footnote. The kicker carries a hairline from the end of the label to the edge of the measure, which
+is what makes an index of one entry read as composed rather than sparse.
+
+Numbered artefact captions (`ARTEFACT 1 · …`) are the third use of the register, and the section
+numerals below are the fourth.
+
+## Four flourishes, and the ones not taken
+
+Everything here is CSS. No images, no script, no colour that was not already a token.
+
+| | |
+| --- | --- |
+| **Section numerals** | `01`, `02` in the left margin beside each `h2`, from a CSS counter. Only at `90rem` and up, where the margin is empty anyway. The heading becomes a flex line whose first item is the numeral and which is pulled left by the numeral column, so the heading text does not move; `align-items: baseline` sits the 12.5px numeral on the 17px heading's baseline without a magic offset. Not `§` — that is a citation mark, and nothing on this site cites a section. |
+| **Scene break** | A thematic break (`***`) in the MDX renders as a centred row of middle dots. Not an asterism (`⁂`): the dot is in the latin subset the fonts were built from, and a glyph missing from a subset falls back to a system face mid-page. |
+| **Link rule** | Links in prose keep the browser's underline at rest, so the resting state is unchanged — descender-aware, and it survives forced colours and print. The flourish is additive: a 2px ink rule draws in beneath it over 260ms and the text goes to ink. The global `prefers-reduced-motion` rule collapses the transition, so it simply appears. |
+| **Numbered artefacts** | The counter is incremented by the `figcaption`, not the `figure`, so an uncaptioned artefact does not consume a number and leave a gap. |
+
+Three more were drawn and rejected, recorded so they are not re-proposed:
+
+- **A drop cap** on the opening paragraph. Strong, and too strong: on a short post it reads as the
+  post dressing up.
+- **Old-style figures** in prose. Attractive in principle for a site this full of numbers, but the
+  difference was not visible enough to justify a feature whose presence in the subsetted font could
+  not be confirmed.
+- **An opening reveal** — hairlines drawing, blocks rising on load. It puts motion between a reader
+  and the text they came for, and on a second visit it is friction.
 
 ## The tone scale, and why it moved
 
