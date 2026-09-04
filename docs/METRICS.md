@@ -160,9 +160,11 @@ The colophon section should carry, in prose rather than a table:
 - the sample sizes behind each figure — the footer is gated at three, so the page is where a reader
   finds out a number rests on four posts
 
-**Settled: the footer line links to `/colophon#the-numbers-in-the-footer`.** It keeps the line's own
-colour and weight and only resolves into a link on hover or focus, so the discoverability arrives
-without the chrome.
+**Settled: a "What these count" link under the strip points at
+`/colophon#the-numbers-in-the-footer`.** The four values are not themselves a link — the strip is a
+labelled `<dl>`, and wrapping it would have made the whole footer one target. The link keeps the
+footer's own colour and weight, underlined in that colour rather than in blue: a link that resolves
+only on hover announces itself to nobody on a touchscreen.
 
 ## Open knobs
 

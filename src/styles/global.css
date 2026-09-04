@@ -170,6 +170,31 @@ a {
     border-bottom: 1px solid var(--rule);
 }
 
+/* Home only. The name is the largest thing on the page there, because the
+ * compact header gave the site no masthead at all — 15px of mono, smaller than
+ * the post title under it, reads as a breadcrumb rather than a title page. The
+ * line beneath is the page's own description, so there is one string to keep
+ * true rather than two. */
+.site-header--masthead {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.125rem;
+    padding-bottom: 1rem;
+}
+
+.masthead-name {
+    font-size: var(--fs-masthead);
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+}
+
+.masthead-line {
+    margin-top: 0.6rem;
+    max-width: 44ch;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
 .site-name {
     font-family: var(--mono);
     font-weight: 500;
@@ -204,7 +229,7 @@ main {
  * 62ch than the body-font header and main, and its hairline would not line up. */
 .site-footer {
     margin-top: 5rem;
-    padding-top: 0.75rem;
+    padding-top: 1rem;
     border-top: 1px solid var(--rule);
 }
 
@@ -215,25 +240,60 @@ main {
     color: var(--faint);
 }
 
-/* The metrics line links to the colophon section that defines it. It keeps the
-   line's own faint colour rather than taking the link colour, so the footer does
-   not gain a line of blue — but it stays underlined in that colour, because a
-   link that only announces itself on hover announces itself to nobody on a
-   touchscreen. --rule sits at 1.29:1 against the paper and was invisible. */
-.site-footer .metrics a {
+/* The four numbers, as a labelled strip rather than the run-on line they were:
+ * this is the one thing on the site no other blog has, and it was set in 11.5px
+ * grey with middle dots between the values. Labels are lowercase in the markup
+ * so METRICS.md and the source still read the same word; the caps are here. */
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.875rem 1.25rem;
+}
+
+.metrics dt {
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    line-height: 1.6;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+}
+
+.metrics dd {
+    margin-top: 0.1rem;
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: var(--fs-metric);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    color: var(--ink);
+}
+
+/* An em dash is the absence of a number, and three of the four are one until
+ * the site has three posts. Setting them in ink would make "not available" the
+ * loudest thing in the footer; --faint is already the site's no-signal tone. */
+.metric-unknown {
+    color: var(--faint);
+}
+
+.metrics-note {
+    margin-top: 1.125rem;
+}
+
+/* Both links keep the line's own faint colour rather than taking the link
+   colour, so the footer does not gain a line of blue — but they stay underlined
+   in that colour, because a link that only announces itself on hover announces
+   itself to nobody on a touchscreen. --rule sits at 1.29:1 against the paper
+   and was invisible. */
+.site-footer .metrics-note a {
     color: inherit;
     text-decoration-color: currentColor;
 }
 
-.site-footer .metrics a:hover,
-.site-footer .metrics a:focus-visible {
+.site-footer .metrics-note a:hover,
+.site-footer .metrics-note a:focus-visible {
     color: var(--info);
     text-decoration-color: currentColor;
-}
-
-/* The reset zeroes paragraph margins, and the footer has no `> * + *` rule. */
-.site-footer p + p {
-    margin-top: 0.4rem;
 }
 
 /* ---------------------------------------------------------------------------
@@ -241,10 +301,11 @@ main {
  * ------------------------------------------------------------------------ */
 
 .post-index li + li {
-    margin-top: 2.25rem;
+    margin-top: 2.75rem;
 }
 
 .post-index > li > a {
+    margin-top: 0.35rem;
     font-family: var(--mono);
     font-weight: 500;
     font-size: var(--fs-index-title);
@@ -261,16 +322,22 @@ main {
 }
 
 .summary {
-    margin-top: 0.4rem;
+    margin-top: 0.5rem;
     color: var(--muted);
 }
 
+/* A kicker above the title, not a trailing footnote under it. The date and the
+ * outcome are what an entry is filed under, and reading them first is what
+ * gives the index three sizes instead of two. Caps and tracking are the same
+ * label register as the footer strip; the outcome keeps its own status colour
+ * on top of this one. */
 .index-meta {
-    margin-top: 0.45rem;
     font-family: var(--mono);
     font-size: var(--fs-utility);
     line-height: 1.6;
-    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--faint);
 }
 
 /* ---------------------------------------------------------------------------
@@ -493,6 +560,13 @@ h1 {
 /* ---------------------------------------------------------------------------
  * Narrow viewports — the floor is 380px.
  * ------------------------------------------------------------------------ */
+
+/* Four cells stop fitting well before the 26rem floor below. */
+@media (max-width: 34rem) {
+    .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
 
 @media (max-width: 26rem) {
     :root {

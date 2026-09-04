@@ -43,7 +43,9 @@ export interface Dora {
     samples: PostSamples | null;
 }
 
-const UNKNOWN = '—';
+/** Exported so the footer can tell a missing value from a measured one and
+ * tone it down, rather than comparing against a literal dash of its own. */
+export const UNKNOWN = '—';
 const WINDOW_DAYS = 90;
 const DAYS_PER_MONTH = 30.437; // mean Gregorian month
 const MS_PER_DAY = 86_400_000;

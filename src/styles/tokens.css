@@ -53,6 +53,8 @@
     --fs-utility: 0.71875rem; /* 11.5px — metadata, dates, tags, footer */
     --fs-index-title: 1.25rem; /* 20px */
     --fs-post-title: 1.625rem; /* 26px */
+    --fs-masthead: 1.75rem; /* 28px — the name, home page only */
+    --fs-metric: 1rem; /* 16px — the four values in the footer strip */
     --lh-body: 1.7;
 
     /* Layout */
@@ -104,8 +106,10 @@
     :root {
         --fs-body: 1.3125rem; /* 21px */
         --fs-utility: 0.78125rem; /* 12.5px */
-        --fs-index-title: 1.625rem; /* 26px */
+        --fs-index-title: 1.75rem; /* 28px */
         --fs-post-title: 2.125rem; /* 34px */
+        --fs-masthead: 2.5rem; /* 40px */
+        --fs-metric: 1.125rem; /* 18px */
         --measure: 56ch;
         --label-col: 84px;
     }

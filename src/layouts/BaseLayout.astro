@@ -10,9 +10,13 @@ interface Props {
     description: string;
     /** Set when the post declares a `canonical` in frontmatter. */
     canonical?: string;
+    /** Home page only. The header becomes a masthead: the name set large, with
+     *  `description` as the line underneath it. Everywhere else keeps the
+     *  compact header, because a masthead on a post competes with its title. */
+    masthead?: boolean;
 }
 
-const { title, description, canonical } = Astro.props;
+const { title, description, canonical, masthead = false } = Astro.props;
 const url = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
 ---
 
@@ -47,8 +51,19 @@ const url = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
     </head>
     <body>
         <a class="skip" href="#main">Skip to content</a>
-        <header class="site-header">
-            <a class="site-name" href="/">André Dreyer</a>
+        <header class:list={['site-header', masthead && 'site-header--masthead']}>
+            {
+                masthead ? (
+                    <div class="masthead">
+                        <h1 class="masthead-name">André Dreyer</h1>
+                        <p class="masthead-line">{description}</p>
+                    </div>
+                ) : (
+                    <a class="site-name" href="/">
+                        André Dreyer
+                    </a>
+                )
+            }
             <nav aria-label="Primary">
                 <a href="/">Posts</a>
                 <a href="/about">About</a>

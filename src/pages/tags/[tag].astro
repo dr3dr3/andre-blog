@@ -27,8 +27,6 @@ const { tag, posts } = Astro.props;
         {
             posts.map((post) => (
                 <li>
-                    <a href={`/posts/${post.id}/`}>{post.data.title}</a>
-                    <p class="summary">{post.data.summary}</p>
                     <p class="index-meta">
                         <time datetime={isoDate(post.data.published)}>{isoDate(post.data.published)}</time>
                         <span class="sep"> · </span>
@@ -38,6 +36,8 @@ const { tag, posts } = Astro.props;
                             changed={post.data.outcome.changed}
                         />
                     </p>
+                    <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+                    <p class="summary">{post.data.summary}</p>
                 </li>
             ))
         }
