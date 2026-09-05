@@ -1,0 +1,75 @@
+---
+title: 'The blog I expected to take a few days'
+summary: 'I wanted AI to take the writing off me. It took the tedious half. Twenty-eight days and one published post later, the half left over is the half with my name on it.'
+published: 2026-09-05
+archetype: 'field-note'
+context: 'a personal blog with an AI writing loop behind it — a drafter working from supplied material, a critic forbidden from rewriting, and a fact-checker'
+stack:
+    - name: 'Astro'
+      version: '7.2.4'
+    - name: '@astrojs/mdx'
+      version: '7.0.7'
+outcome:
+    status: 'shipped'
+tags: ['writing', 'tooling']
+draft: true
+---
+
+import Artefact from '../../components/Artefact.astro';
+
+`[[TK: PUBLISHED DATE IS A PLACEHOLDER. Set to 2026-09-05 only so the content schema parses — z.date() will not accept a marker. André sets the real date at publish.]]`
+
+I expected this blog to be a few days of work. Twenty-eight days after the first commit it has one
+published post.
+
+The building was the easy part. What sits behind it now is a loop: something that drafts only from
+raw material I supply, a critic that returns objections and is forbidden from rewriting a single
+line, and a fact-checker that traces every number in a draft back to where it came from. All of that
+worked. On my own reckoning it is faster than writing the posts by hand and better than what I would
+have produced, because it takes the tedious work away and it does more than I would have done.
+
+What it does not take is the half with my name on it — deciding what I am happy to publish, and
+whether it is true.
+
+That half is not small. The rules and the skills that govern how a post gets written run to 10,873
+words. The one published post is 2,557. Before either of those mattered I had to hand over 6,552
+words of raw material: what happened, in what order, with the numbers and the logs. A drafter that
+invents nothing can only arrange what it is given.
+
+Where that supply runs out, the machinery stops rather than guesses. The second post I started is
+still where it stopped. It was drafted the day after the site went up, it runs to 1,614 words, and it
+carries thirteen open questions. Its central section, the one the format makes mandatory, is this in
+full:
+
+<Artefact caption="The mandatory section of the second post I drafted, complete and unedited, as it has stood since 9 August 2026. The markers are the drafting tool's way of recording a fact it was not given.">
+{`## What I tried first
+
+[[TK: this section is the post. How many versions of the written process were there before the
+checks moved into the pipeline, and over what period?]]
+
+[[TK: what was each attempt, in the order it happened? A page in the wiki, a pull request template, a
+runbook, a checklist in the PR description, an AI-assistant instruction file — which of these, and in
+what order?]]
+
+[[TK: what was the reasoning at the time for each one? Not the hindsight reasoning — what made it
+look like the right next move when it was made?]]
+
+[[TK: what did each attempt cost? Time to write, time to maintain, or a specific incident it failed
+to prevent.]]
+
+[[TK: did any of them make things worse? A longer document that got read less, or a checklist so
+detailed people started copy-pasting the ticks?]]
+
+[[TK: what was the moment it became clear that documenting it harder was not going to work?]]`}
+</Artefact>
+
+Six questions and no prose. Every one of them is answerable, and every one of them is answerable only
+by me.
+
+***
+
+The catch is not the iterating. It is that iterating needs direction, and direction competes with
+everything else that wants attention. That post has sat untouched for twenty-seven days. In the same
+twenty-seven days, forty-five commits landed on this repository across seven working days, including
+the drafting and publishing of a different post. I was not away. This blog is not important, so it
+was easy to side-line.
