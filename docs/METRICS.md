@@ -18,9 +18,22 @@ frame is a nod rather than a claim.
    whole reason the file exists in its current shape.
 3. **Never fail a build.** Every git call is wrapped, every error swallowed. A footer that cannot be
    computed is a footer full of em dashes, not a failed deploy.
-4. **A complete history is required.** Vercel builds from a truncated clone. `getDora` asks for the
-   rest of the history first; if that fetch does not land, every metric below reports an em dash
-   rather than measuring a fragment.
+4. **A complete history is required — behind the ref being measured.** Vercel builds from a
+   truncated clone. `getDora` asks for the rest of the history first, then checks that what it is
+   about to measure is whole: a shallow clone records its cut points in `.git/shallow`, and those
+   commits look parentless to git even though the project continues past them. If any parentless
+   commit reachable from the measured ref is one of them, every metric reports an em dash rather
+   than measuring a fragment.
+
+   The check is deliberately about that ref and not about the repository. It was broader once — any
+   entry in `.git/shallow` at all — and that made every metric on production an em dash while the
+   same commit measured fine locally. The Vercel build log showed `fetch --unshallow landed`
+   immediately followed by the refusal, so the fetch had succeeded and the file still had entries
+   afterwards. Four clone shapes were tried against this repository to reproduce it (`--depth=10`,
+   the same with `--no-single-branch`, `--depth=1`, and a `git init` plus a depth-limited fetch of a
+   single commit); every one emptied the file on `--unshallow`, so whatever leaves entries behind is
+   specific to the builder. A graft the measurement never walks past cannot make the measurement a
+   fragment, so it no longer disqualifies one.
 5. **A median of one is not a median.** Each metric renders an em dash until it has at least
    **three** samples. Below that the footer stays quiet and the colophon carries the detail.
 

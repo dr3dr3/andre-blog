@@ -159,6 +159,45 @@ function deepen(): void {
 }
 
 /**
+ * Whether the history behind `ref` is complete enough to measure.
+ *
+ * Rule 4 asks whether the history *being measured* is whole. The earlier form of
+ * this check asked something broader — whether `.git/shallow` recorded a graft
+ * anywhere in the repository — and those are not the same question.
+ *
+ * They came apart on Vercel. The build log there reads `fetch --unshallow
+ * landed` immediately followed by the refusal, so the fetch succeeded and the
+ * file still had entries in it afterwards. Four local clone shapes were tried
+ * against this repository — `--depth=10`, the same with `--no-single-branch`,
+ * `--depth=1`, and a bare `git init` plus a depth-limited fetch of one commit,
+ * which is the shape a builder checking out a SHA produces. Every one of them
+ * emptied the file on `--unshallow`, so whatever leaves entries behind is
+ * specific to the builder and could not be reproduced here.
+ *
+ * It does not need to be. A graft the measurement never walks past cannot make
+ * the measurement a fragment. So the boundary is intersected with the parentless
+ * commits reachable from `ref`: a graft looks parentless to git even though the
+ * project continues past it, so if none of `ref`'s roots is a graft, nothing
+ * behind `ref` is missing and every metric can be computed honestly.
+ *
+ * Conservative when it cannot tell. No roots means rev-list failed, and that
+ * reports incomplete rather than measuring on an unknown.
+ */
+function historyIsComplete(ref: string): boolean {
+    const boundary = shallowBoundary();
+    const roots = lines(git(['rev-list', '--max-parents=0', ref]));
+    const grafted = roots.filter((sha) => boundary.has(sha));
+
+    note(
+        `history — ${git(['rev-list', '--count', ref]) ?? '?'} commits on ${ref}; ` +
+            `${boundary.size} graft point(s) recorded; ` +
+            `root(s) ${roots.join(' ') || 'none'}; ${grafted.length} of them grafted`,
+    );
+
+    return roots.length > 0 && grafted.length === 0;
+}
+
+/**
  * Whole days between two calendar dates, in UTC.
  *
  * Both metrics that use this span a `published` date and a commit timestamp.
@@ -351,10 +390,10 @@ export function getDora(): Dora {
 
     // Rule 4. Metric 1 measures a trailing window and metrics 2 to 4 measure the
     // whole archive, so a history that stops early makes every one of them a
-    // fragment presented as a measurement. A graft is what distinguishes a
-    // truncated clone from a genuinely young project.
-    if (shallowBoundary().size > 0) {
-        note('history is still truncated after the fetch; all four metrics report em dashes');
+    // fragment presented as a measurement. A graft on the measured ref's own
+    // ancestry is what distinguishes a truncated clone from a young project.
+    if (!historyIsComplete(ref)) {
+        note('history behind the measured ref is incomplete; all four metrics report em dashes');
         cached = none;
         return cached;
     }
