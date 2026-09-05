@@ -64,7 +64,12 @@ const gate = (ok, label, evidence) => {
 console.log(`\npre-publish gates — ${slug}\n`);
 
 // The one marker allowed through is the published-date placeholder this script replaces.
-const markers = [...src.matchAll(/\[\[TK:([\s\S]{0,60})/g)].map((m) => m[1].trim());
+// Artefact blocks are excluded: their contents are quoted evidence, and a post may
+// legitimately reproduce a document that is itself made of [[TK: markers. A marker
+// standing in for an artefact that was never supplied sits in prose, not inside a
+// rendered <Artefact>, so it is still caught.
+const outsideArtefacts = src.replace(/<Artefact[\s\S]*?<\/Artefact>/g, '');
+const markers = [...outsideArtefacts.matchAll(/\[\[TK:([\s\S]{0,60})/g)].map((m) => m[1].trim());
 const stray = markers.filter((m) => !/PUBLISHED DATE IS A PLACEHOLDER/.test(m));
 gate(stray.length === 0, '[[TK: markers answered', stray.map((m) => `"${m}…"`).join(', '));
 
@@ -82,9 +87,9 @@ gate(grading.length === 0, 'no self-grading adjectives', grading.join(', '));
 const ize = src.match(/\w+iz(?:e|ed|ing|ation)\b/g) ?? [];
 gate(ize.length === 0, 'Australian English (-ise)', ize.join(', '));
 
-const artefacts = (src.match(/<Artefact/g) ?? []).length;
-const captioned = (src.match(/<Artefact caption=/g) ?? []).length;
-gate(artefacts === captioned, 'every artefact captioned', `${captioned}/${artefacts}`);
+const artefactTags = src.match(/<Artefact\b[^>]*>/g) ?? [];
+const captioned = artefactTags.filter((tag) => /\bcaption=/.test(tag)).length;
+gate(artefactTags.length === captioned, 'every artefact captioned', `${captioned}/${artefactTags.length}`);
 
 const title = field('title') ?? '';
 const summary = field('summary') ?? '';
