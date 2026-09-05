@@ -1,5 +1,7 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { isAbsolute, join } from 'node:path';
 
 /**
  * The four numbers in the site footer, computed from git history at build time.
@@ -50,6 +52,20 @@ const WINDOW_DAYS = 90;
 const DAYS_PER_MONTH = 30.437; // mean Gregorian month
 const MS_PER_DAY = 86_400_000;
 const DEEPEN_TIMEOUT_MS = 60_000;
+const CLONE_TIMEOUT_MS = 120_000;
+
+/**
+ * Where every git command in this file runs.
+ *
+ * Normally the build's own checkout. It moves to a clone this module made when
+ * the checkout turns out to be unmeasurable — see `cloneHistory` — and because
+ * that clone is an ordinary one with a working tree and an index, every command
+ * below keeps working against it unchanged.
+ */
+let repoRoot = process.cwd();
+
+/** The clone this module made, so it can be removed again. */
+let clonedInto: string | null = null;
 
 /** Rule 5: a median of one is the value itself and a median of two is a midpoint. */
 const SAMPLE_GATE = 3;
@@ -62,7 +78,7 @@ function git(args: string[], timeout?: number): string | null {
         const out = execFileSync('git', args, {
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'ignore'],
-            cwd: process.cwd(),
+            cwd: repoRoot,
             timeout,
         });
         return out.trim();
@@ -114,7 +130,8 @@ function shallowBoundary(): Set<string> {
     if (!path) return new Set();
 
     try {
-        return new Set(readFileSync(path, 'utf8').split('\n').filter(Boolean));
+        const absolute = isAbsolute(path) ? path : join(repoRoot, path);
+        return new Set(readFileSync(absolute, 'utf8').split('\n').filter(Boolean));
     } catch {
         // The usual case: the clone is not shallow, so the file does not exist.
         return new Set();
@@ -146,7 +163,7 @@ function deepen(): void {
         execFileSync('git', ['fetch', '--unshallow', '--quiet'], {
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'pipe'],
-            cwd: process.cwd(),
+            cwd: repoRoot,
             timeout: DEEPEN_TIMEOUT_MS,
         });
         note('clone was truncated; fetch --unshallow landed');
@@ -155,6 +172,92 @@ function deepen(): void {
         note(
             `clone was truncated and fetch --unshallow did not land: ${stderr?.trim() || message || String(err)}`,
         );
+    }
+}
+
+/**
+ * The URL to clone the project's own history from.
+ *
+ * Built from Vercel's git environment variables when they are present, rather
+ * than from the checkout's own remote: the point of cloning is that the
+ * checkout is not to be trusted, and its `origin` may carry a credential that
+ * is scoped to the build or already expired. This repository is public, so an
+ * anonymous clone is all that is needed. Falls back to the configured remote,
+ * which is what makes this work in a local build.
+ */
+function remoteUrl(): string | null {
+    const provider = process.env.VERCEL_GIT_PROVIDER;
+    const owner = process.env.VERCEL_GIT_REPO_OWNER;
+    const slug = process.env.VERCEL_GIT_REPO_SLUG;
+
+    if (provider === 'github' && owner && slug) {
+        return `https://github.com/${owner}/${slug}.git`;
+    }
+
+    return git(['remote', 'get-url', 'origin']);
+}
+
+/**
+ * Clone the project's history into a temp directory, and answer with its path.
+ *
+ * The last resort, and only reached when the build's own checkout cannot be
+ * measured. Vercel's checkout is a depth-limited fetch of a single commit with
+ * no branch refspec: `fetch --unshallow` therefore has nothing to deepen, exits
+ * zero without delivering anything, and leaves a detached HEAD whose every root
+ * is a graft. No amount of fetching inside that checkout repairs it.
+ *
+ * An ordinary clone, not a bare or blobless one. The metrics need an index for
+ * `ls-files`, and blobs for `--follow`, `-S` and `show`, so the cheap variants
+ * would each break a different metric — and against a repository this size the
+ * full clone measured about a second.
+ *
+ * Best effort, like every other git call here. It must never fail a build, so
+ * it is bounded by a timeout and its error is caught and narrated.
+ */
+function cloneHistory(): string | null {
+    const url = remoteUrl();
+    if (!url) {
+        note('no remote to clone the history from');
+        return null;
+    }
+
+    let dir: string;
+    try {
+        dir = mkdtempSync(join(tmpdir(), 'dora-'));
+    } catch (err) {
+        note(`could not make a temp directory to clone into: ${String(err)}`);
+        return null;
+    }
+
+    try {
+        execFileSync('git', ['clone', '--quiet', url, dir], {
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'pipe'],
+            timeout: CLONE_TIMEOUT_MS,
+        });
+        clonedInto = dir;
+        note(`cloned the history from ${url}`);
+        return dir;
+    } catch (err) {
+        const { stderr, message } = err as { stderr?: string; message?: string };
+        note(`could not clone the history from ${url}: ${stderr?.trim() || message || String(err)}`);
+        return null;
+    }
+}
+
+/** Remove the clone this module made, if it made one. */
+function discardClone(): void {
+    if (!clonedInto) return;
+
+    const dir = clonedInto;
+    clonedInto = null;
+    repoRoot = process.cwd();
+
+    try {
+        rmSync(dir, { recursive: true, force: true });
+    } catch {
+        // A build container is discarded anyway, and a temp directory left
+        // behind is not worth failing a build over.
     }
 }
 
@@ -314,7 +417,7 @@ function changesBody(sha: string, path: string): boolean {
 function postFacts(path: string, buildDate: Date): PostFacts | null {
     let source: string;
     try {
-        source = readFileSync(path, 'utf8');
+        source = readFileSync(join(repoRoot, path), 'utf8');
     } catch {
         return null;
     }
@@ -379,21 +482,33 @@ export function getDora(): Dora {
         samples: null,
     };
 
-    const ref = mainRef();
-    if (!ref) {
-        note('no ref to measure; git is unavailable or this is not a repository');
-        cached = none;
-        return cached;
-    }
-
-    deepen();
-
     // Rule 4. Metric 1 measures a trailing window and metrics 2 to 4 measure the
     // whole archive, so a history that stops early makes every one of them a
     // fragment presented as a measurement. A graft on the measured ref's own
     // ancestry is what distinguishes a truncated clone from a young project.
-    if (!historyIsComplete(ref)) {
-        note('history behind the measured ref is incomplete; all four metrics report em dashes');
+    let ref = mainRef();
+
+    if (ref) {
+        deepen();
+        if (!historyIsComplete(ref)) ref = null;
+    } else {
+        note('no ref to measure in the build checkout');
+    }
+
+    // The checkout could not be made whole in place. Measure a clone of our own
+    // instead: still git, still at build time, still nothing stored.
+    if (!ref) {
+        const own = cloneHistory();
+        if (own) {
+            repoRoot = own;
+            ref = mainRef();
+            if (ref && !historyIsComplete(ref)) ref = null;
+        }
+    }
+
+    if (!ref) {
+        note('no complete history to measure; all four metrics report em dashes');
+        discardClone();
         cached = none;
         return cached;
     }
@@ -438,5 +553,7 @@ export function getDora(): Dora {
         timeToRevise: timeToRevise.length >= SAMPLE_GATE ? formatDays(median(timeToRevise)) : UNKNOWN,
         samples,
     };
+
+    discardClone();
     return cached;
 }

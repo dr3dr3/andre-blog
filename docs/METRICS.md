@@ -12,7 +12,8 @@ frame is a nod rather than a claim.
 ## Rules that apply to all four
 
 1. **Computed from git at build time.** No API, no database, no stored state. Every page in a build
-   renders the same line.
+   renders the same line. Git is the only source; where the build's own checkout cannot answer, the
+   history is cloned and asked again, which is rule 4.
 2. **Never guess.** A number that cannot be computed honestly renders as an em dash. An em dash
    means *not available*, not zero. This follows rule 1 of [CLAUDE.md](../CLAUDE.md) and is the
    whole reason the file exists in its current shape.
@@ -25,15 +26,37 @@ frame is a nod rather than a claim.
    commit reachable from the measured ref is one of them, every metric reports an em dash rather
    than measuring a fragment.
 
-   The check is deliberately about that ref and not about the repository. It was broader once — any
-   entry in `.git/shallow` at all — and that made every metric on production an em dash while the
-   same commit measured fine locally. The Vercel build log showed `fetch --unshallow landed`
-   immediately followed by the refusal, so the fetch had succeeded and the file still had entries
-   afterwards. Four clone shapes were tried against this repository to reproduce it (`--depth=10`,
-   the same with `--no-single-branch`, `--depth=1`, and a `git init` plus a depth-limited fetch of a
-   single commit); every one emptied the file on `--unshallow`, so whatever leaves entries behind is
-   specific to the builder. A graft the measurement never walks past cannot make the measurement a
-   fragment, so it no longer disqualifies one.
+   The check is about that ref and not about the repository, and it was broader once — any entry in
+   `.git/shallow` at all. That made every metric on production an em dash, and it is the reason this
+   section exists.
+
+   **What the build log showed.** First `fetch --unshallow landed` immediately followed by a refusal,
+   which said the fetch had succeeded and the file still had entries afterwards. Sharpening the check
+   to the measured ref's own ancestry did not fix it, but it made the log specific: **22 commits on a
+   detached `HEAD`, four graft points, all four of them roots of the ref being measured.** Neither
+   `refs/heads/main` nor `refs/remotes/origin/main` existed. So the history really was truncated, and
+   `--unshallow` had exited zero without delivering any of it — with no branch refspec there was
+   nothing for it to deepen.
+
+   Six clone shapes were tried locally against this repository to reproduce that (`--depth=10`, the
+   same with `--no-single-branch`, `--depth=1`, a `git init` plus a depth-limited fetch of one commit,
+   the same with the remote's fetch refspec unset, and the same again with the remote-tracking ref
+   deleted). Every one of them repaired itself on `--unshallow`. Whatever produces the builder's
+   checkout is its own, and it cannot be repaired from inside it.
+
+   **So the history is cloned instead.** When the checkout cannot be made whole in place, `getDora`
+   clones the project into a temp directory, measures that, and deletes it. The URL is built from
+   `VERCEL_GIT_PROVIDER`, `VERCEL_GIT_REPO_OWNER` and `VERCEL_GIT_REPO_SLUG` rather than from the
+   checkout's own remote — the whole point is that the checkout is not to be trusted, and its
+   `origin` may carry a credential scoped to the build — falling back to the configured remote, which
+   is what makes a local build work without touching the network. The repository is public, so the
+   clone is anonymous. Measured at about 1.4 seconds end to end.
+
+   It is an ordinary clone, not a bare or blobless one: `ls-files` needs an index, and `--follow`,
+   `-S` and `show` need blobs, so each cheaper variant would break a different metric.
+
+   Rule 3 still governs all of it. A clone that fails is caught and narrated, and the footer fills
+   with em dashes rather than failing the build.
 5. **A median of one is not a median.** Each metric renders an em dash until it has at least
    **three** samples. Below that the footer stays quiet and the colophon carries the detail.
 
