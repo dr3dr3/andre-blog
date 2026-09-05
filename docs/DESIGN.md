@@ -132,6 +132,14 @@ would have the opposite problem and compete with the title, so `BaseLayout` take
 and only `index.astro` passes it. The description is rendered from the same prop that sets the meta
 description, so the visible line and the one search results show cannot drift apart.
 
+The masthead carries no bottom border. The compact header does, and keeps it — on a post page
+nothing else rules across the page beneath it. The masthead is the only header followed directly by
+an index entry, and that entry's kicker draws its own hairline to the edge of the measure 3.5rem
+below, so the home page opened with two full-width rules in sequence and a single label between
+them. That reads as one stray rule, not two boundaries. The kicker's hairline is the one that
+survives: it is the thing making a one-entry index look composed, where the header's was only
+underlining a block the masthead's own size already sets apart.
+
 ## The label register
 
 Two places set utility type in caps with `0.06`–`0.08em` of tracking: the kicker above an index

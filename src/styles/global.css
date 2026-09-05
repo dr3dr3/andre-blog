@@ -175,11 +175,20 @@ a {
  * the post title under it, reads as a breadcrumb rather than a title page. The
  * line beneath is the page's own description, so there is one string to keep
  * true rather than two. */
+/* No bottom border on this one. The masthead is the only header directly
+ * followed by an index entry, and the entry's kicker draws its own hairline to
+ * the edge of the measure 3.5rem later — two full-width rules in sequence with
+ * a single label between them, which reads as a stray rule rather than as two
+ * boundaries. The kicker's hairline is the one that survives: it is doing real
+ * work on an index this short, where the header's is only underlining a block
+ * that the masthead's own size already separates. The compact header keeps its
+ * border, because on a post page nothing rules across the page beneath it. */
 .site-header--masthead {
     flex-direction: column;
     align-items: stretch;
     gap: 1.125rem;
     padding-bottom: 1rem;
+    border-bottom: 0;
 }
 
 .masthead-name {
