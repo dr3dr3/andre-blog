@@ -120,8 +120,11 @@ src = src.replace(/`\[\[TK: PUBLISHED DATE IS A PLACEHOLDER[\s\S]*?\]\]`\n\n/, '
 src = src.replace(/^draft: true$/m, 'draft: false');
 writeFileSync(path, src);
 
+// Same exclusion as the gate above: markers quoted inside an artefact are evidence,
+// not unanswered questions, and must not fail the write-back check.
 const after = readFileSync(path, 'utf8');
-if (after.includes('[[TK:') || !/^draft: false$/m.test(after)) {
+const afterOutsideArtefacts = after.replace(/<Artefact[\s\S]*?<\/Artefact>/g, '');
+if (afterOutsideArtefacts.includes('[[TK:') || !/^draft: false$/m.test(after)) {
     console.error('post-write verification failed — inspect the file before committing');
     process.exit(1);
 }
