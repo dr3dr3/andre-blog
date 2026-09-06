@@ -102,6 +102,7 @@ html {
 }
 
 body {
+    background: var(--paper);
     color: var(--ink);
     font-family: var(--serif);
     font-size: var(--fs-body);
@@ -116,83 +117,6 @@ main,
     max-width: var(--measure);
     margin-inline: auto;
 }
-
-/* ---------------------------------------------------------------------------
- * The sheet.
- *
- * The ground is not flat colour. Two layers of fractal noise sit behind
- * everything: `grain`, fine and tiled, and `mottle`, very low frequency, which
- * is the uneven thickness of a sheet that was not made by a machine. Neither
- * contains a single path — the SVG is a filter, not a drawing, and the pair
- * costs 846 bytes with no request of their own.
- *
- * They carry no motif on purpose. Everything drawn that was tried here read as
- * a picture placed behind the text, and a faint picture is still a picture. A
- * material is not; it has nothing to recognise, so nothing to tire of. The
- * contrast the site wanted — something organic against something exact — is
- * then the literal fact of the page rather than an illustration of it.
- *
- * Tuned for the dark ground, which is the harder one: the same ratio reads
- * louder on slate, and noise on a dark field reads as sensor noise if it is
- * allowed to get above about 1.05:1. Light follows comfortably.
- *
- * Grain sits at baseFrequency 0.6, so its features are ~1.67px. Finer than that
- * is sub-pixel on a 1x display and crawls while the page scrolls, for no gain:
- * at 0.92 the measured contrast is identical to three decimal places.
- *
- * There is no fibre layer. Directional noise was the one thing here a reader
- * could recognise — streaks running parallel to the lines of text, and a scan
- * artefact on the dark ground — so it did not earn its place.
- *
- * `body` no longer paints its own background, and must not: a negative
- * z-index pseudo-element paints before an in-flow block's background, so the
- * layers would be buried under it. `html` holds the ground instead.
- * ------------------------------------------------------------------------ */
-
-body::before,
-body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-color: var(--texture);
-}
-
-body::before {
-    -webkit-mask-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22240%22%20height%3D%22240%22%20viewBox%3D%220%200%20240%20240%22%3E%3Cfilter%20id%3D%22g%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22sRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.600%22%20numOctaves%3D%223%22%20seed%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%201%20%200%200%200%200%201%20%200%200%200%200%201%20%200.170%200%200%200%200%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23g%29%22%2F%3E%3C%2Fsvg%3E);
-    mask-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22240%22%20height%3D%22240%22%20viewBox%3D%220%200%20240%20240%22%3E%3Cfilter%20id%3D%22g%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22sRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.600%22%20numOctaves%3D%223%22%20seed%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%201%20%200%200%200%200%201%20%200%200%200%200%201%20%200.170%200%200%200%200%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23g%29%22%2F%3E%3C%2Fsvg%3E);
-    -webkit-mask-size: 240px 240px;
-    mask-size: 240px 240px;
-    -webkit-mask-repeat: repeat;
-    mask-repeat: repeat;
-}
-
-body::after {
-    -webkit-mask-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%221200%22%20height%3D%221200%22%20viewBox%3D%220%200%201200%201200%22%3E%3Cfilter%20id%3D%22m%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22sRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.00360%22%20numOctaves%3D%222%22%20seed%3D%2217%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%201%20%200%200%200%200%201%20%200%200%200%200%201%20%200.120%200%200%200%200%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23m%29%22%2F%3E%3C%2Fsvg%3E);
-    mask-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%221200%22%20height%3D%221200%22%20viewBox%3D%220%200%201200%201200%22%3E%3Cfilter%20id%3D%22m%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22sRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.00360%22%20numOctaves%3D%222%22%20seed%3D%2217%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%201%20%200%200%200%200%201%20%200%200%200%200%201%20%200.120%200%200%200%200%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23m%29%22%2F%3E%3C%2Fsvg%3E);
-    -webkit-mask-size: cover;
-    mask-size: cover;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-}
-
-/* Paper on paper is not a texture, and a forced-colours mode has asked for
- * exactly the colours it names. */
-@media print {
-    body::before,
-    body::after {
-        display: none;
-    }
-}
-
-@media (forced-colors: active) {
-    body::before,
-    body::after {
-        display: none;
-    }
-}
-
 
 a {
     color: var(--info);

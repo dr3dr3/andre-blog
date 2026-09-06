@@ -167,7 +167,7 @@ Everything here is CSS. No images, no script, no colour that was not already a t
 | **Link rule** | Links in prose keep the browser's underline at rest, so the resting state is unchanged — descender-aware, and it survives forced colours and print. The flourish is additive: a 2px ink rule draws in beneath it over 260ms and the text goes to ink. The global `prefers-reduced-motion` rule collapses the transition, so it simply appears. |
 | **Numbered artefacts** | The counter is incremented by the `figcaption`, not the `figure`, so an uncaptioned artefact does not consume a number and leave a gap. |
 
-Three more were drawn and rejected, recorded so they are not re-proposed:
+Four more were drawn and rejected, recorded so they are not re-proposed:
 
 - **A drop cap** on the opening paragraph. Strong, and too strong: on a short post it reads as the
   post dressing up.
@@ -176,54 +176,18 @@ Three more were drawn and rejected, recorded so they are not re-proposed:
   not be confirmed.
 - **An opening reveal** — hairlines drawing, blocks rising on load. It puts motion between a reader
   and the text they came for, and on a second visit it is friction.
+- **A textured ground.** Shipped on 2026-09-05 and pulled the next day. Two `feTurbulence` layers
+  behind everything — fine tiled grain and low-frequency mottle — drawn from a `--texture` token at
+  a measured mean of 1.030:1 on `--paper`, below `--wash`. It looked right. It was not free:
+  `feTurbulence` is a procedural noise generator, and the mottle layer asked the compositor to
+  rasterise 1200 × 1200 of fractal noise before it could present a frame. That is raster-thread
+  work, so it never showed in Total Blocking Time — it showed in Speed Index, which stayed amber on
+  an emulated mid-range phone while every other metric was green.
 
-## The sheet
-
-The ground is not flat colour. Two layers of fractal noise sit behind everything, drawn from a new
-`--texture` token: **grain**, fine and tiled, and **mottle**, very low frequency — the uneven
-thickness of a sheet that was not made by a machine. Neither contains a single path. The SVG is an
-`feTurbulence` filter rather than a drawing, and the pair costs **846 bytes** with no request of
-their own.
-
-| | Light | Dark |
-| --- | --- | --- |
-| `--texture` | `#DCDDDA` | `#292B2D` |
-| Mean on `--paper` | 1.030:1 | 1.027:1 |
-| Peak on `--paper` | 1.054:1 | 1.049:1 |
-
-That sits **below `--wash`** (1.089:1), which is the point. `--wash` is the faintest surface with a
-job — an artefact block you are meant to notice. This has no job but to stop the ground being dead,
-so it belongs under the floor rather than inside the tonal range that carries meaning.
-
-It carries no motif, and that is the decision rather than an omission. Fifteen drawn textures were
-tried first — organic against industrial, scaffolds and vines, trusses, contours, and six systems of
-scattered geometry — and every one read as a picture placed behind the text. A faint picture is
-still a picture, and the fainter it gets the more it looks like something you failed to remove. A
-material is not a picture: there is nothing to recognise, so nothing to tire of. The contrast the
-site was after — something organic against something exact — is then the literal fact of the page
-rather than an illustration of it.
-
-Three constraints fix the values.
-
-1. **Tuned for the dark ground**, which is the harder one. The same ratio reads louder on slate, and
-   noise on a dark field reads as *sensor* noise once it is much above 1.05:1. Light follows
-   comfortably; the reverse does not.
-2. **Grain sits at `baseFrequency` 0.6**, so its features are about 1.67px. Finer is sub-pixel on a
-   1× display and crawls while the page scrolls, for nothing: at 0.92 the measured contrast is
-   identical to three decimal places.
-3. **There is no fibre layer.** Directional noise was drawn and rejected — it was the one thing here
-   a reader could recognise, as streaks running parallel to the lines of text and as a scan artefact
-   on the dark ground.
-
-Both layers are `display: none` in print and under `forced-colors: active`. Paper on paper is not a
-texture, and a forced-colours mode has asked for exactly the colours it names.
-
-One implementation note that is easy to undo by accident: **`body` must not paint its own
-background.** A negative `z-index` pseudo-element is painted *before* an in-flow block's background,
-so the two layers would be buried under it. `html` holds the ground instead.
-
-If the sheet ever reads as too subtle, the dial is **mottle**, not grain. Mottle is low frequency,
-so it adds life without adding perceptible noise; turning grain up just makes the page look noisy.
+  Fifteen drawn textures were tried before it and rejected for reading as pictures placed behind the
+  text; the material approach was the answer to that and remains the right idea. Anything revisiting
+  it should pre-rasterise the noise rather than generate it at paint time, and should carry a
+  Lighthouse number before and after.
 
 ## The tone scale, and why it moved
 

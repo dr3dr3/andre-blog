@@ -33,15 +33,6 @@
     --faint: #6b6f6a; /* 4.68:1 — the AA floor for 11.5px utility text */
     --wash: #eaece7; /* artefact blocks */
 
-    /* The sheet. A surface, not a status hue — it is the ground with a little
-     * ink stirred in, which is why it takes no place in the colour vocabulary
-     * of docs/DESIGN.md. Two turbulence layers in global.css draw their colour
-     * from it: grain at 17% alpha and mottle at 12%, landing the paper at a
-     * mean 1.030:1 against --paper and a peak of 1.054:1. That is deliberately
-     * below --wash (1.089:1), the faintest surface with a job: --wash is meant
-     * to be noticed and this is not. */
-    --texture: #dcddda;
-
     /* Status. Named for the job, not the hue, so a value can shift without the
      * token lying. Green, blue and amber label an outcome; red is reserved for
      * evidence of a failure and is deliberately rare. `experiment` takes no
@@ -83,7 +74,6 @@
         --muted: #b3b8b0; /* 8.83:1 */
         --faint: #8f968f; /* 5.88:1 */
         --wash: #1c2024;
-        --texture: #292b2d; /* mean 1.027:1, peak 1.049:1 on the slate ground */
 
         --ok: #79b39c;
         --info: #84aecf;
