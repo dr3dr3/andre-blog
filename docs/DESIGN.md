@@ -181,13 +181,38 @@ Four more were drawn and rejected, recorded so they are not re-proposed:
   a measured mean of 1.030:1 on `--paper`, below `--wash`. It looked right. It was not free:
   `feTurbulence` is a procedural noise generator, and the mottle layer asked the compositor to
   rasterise 1200 × 1200 of fractal noise before it could present a frame. That is raster-thread
-  work, so it never showed in Total Blocking Time — it showed in Speed Index, which stayed amber on
-  an emulated mid-range phone while every other metric was green.
+  work, so it never showed in Total Blocking Time — it showed in Speed Index.
 
-  Fifteen drawn textures were tried before it and rejected for reading as pictures placed behind the
-  text; the material approach was the answer to that and remains the right idea. Anything revisiting
-  it should pre-rasterise the noise rather than generate it at paint time, and should carry a
-  Lighthouse number before and after.
+  Measured, on an emulated Moto G Power over Slow 4G, Lighthouse 13.4.1:
+
+  | | With the grain | Without |
+  | --- | --- | --- |
+  | Performance | 98 | **100** |
+  | Speed Index | 3.8s | **1.0s** |
+  | First Contentful Paint | 0.8s | 0.8s |
+  | Largest Contentful Paint | 1.7s | 1.7s |
+  | Total Blocking Time | 0ms | 30ms |
+  | Cumulative Layout Shift | 0 | 0.013 |
+
+  **2.8 seconds of Speed Index**, and nothing else. FCP and LCP did not move at all, which is the
+  signature of raster-thread cost rather than anything on the critical path — the page reached its
+  first paint on time and then took seconds to finish filling in. The filmstrip is the clearest
+  evidence: six blank frames before, content from the second frame after.
+
+  TBT and CLS got very slightly *worse* on removal, and that is not a regression. The page now
+  paints early enough that the font swap lands after first paint instead of being hidden behind a
+  blocked render. Both stay green with a wide margin.
+
+  Two wrong diagnoses are worth recording so they are not repeated. The render-blocking stylesheet
+  Lighthouse flagged was a red herring: inlining it made that audit pass and moved the score not at
+  all. So were the fonts — 163KB preloaded at highest priority, which looked damning next to a 5KB
+  document and is plainly fine at a Speed Index of 1.0s.
+
+  Fifteen drawn textures were tried before this one and rejected for reading as pictures placed
+  behind the text; the material approach was the answer to that and remains the right idea. Anything
+  reviving it must **pre-rasterise the noise rather than generate it at paint time**, and must carry
+  a Lighthouse number before and after. The cheaper half-step, untested: keep the 240 × 240 grain
+  and drop the mottle, which was 25× the pixel count and did most of the damage.
 
 ## The tone scale, and why it moved
 
