@@ -30,6 +30,10 @@ export const GET: APIRoute = async ({ site }) => {
 
     const xml = [
         '<?xml version="1.0" encoding="UTF-8"?>',
+        // Browsers apply this to the feed themselves. Without it, opening
+        // /rss.xml shows a wall of raw XML or a download prompt, which reads as
+        // the site being broken. Costs the site nothing: no page loads it.
+        '<?xml-stylesheet type="text/xsl" href="/rss.xsl"?>',
         '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
         '    <channel>',
         '        <title>André Dreyer</title>',

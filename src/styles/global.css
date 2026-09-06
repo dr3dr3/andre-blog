@@ -907,3 +907,28 @@ h1 {
         gap: 4pt 12pt;
     }
 }
+
+/* ---------------------------------------------------------------------------
+ * Not found.
+ *
+ * The numeral is set in the label register rather than as a giant 404, which is
+ * the one thing every other 404 page does. It states the status code because
+ * that is the useful fact, and then gets out of the way of the archive listed
+ * beneath it.
+ * ------------------------------------------------------------------------ */
+
+.notfound-code {
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 0.5rem;
+}
+
+.notfound-index {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--rule);
+}

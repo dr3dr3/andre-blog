@@ -311,6 +311,26 @@ things about that pipeline are worth knowing before touching it, because each on
 The cards are static files that no page loads, so they cost nothing against
 [PERFORMANCE.md](PERFORMANCE.md).
 
+## The feed, and the 404
+
+Two pages a reader can land on that were never designed.
+
+**The feed.** Opening `/rss.xml` in a browser gave a wall of raw XML, or a download prompt, which
+reads as the site being broken rather than as a feed. `public/rss.xsl` is an XSL stylesheet the
+browser applies to the feed itself: the same wordmark, the same kicker with its rule running out, the
+same measure, plus a banner saying plainly that this is a feed and where to paste it. Being an XSL
+result it has no access to the site's stylesheet, so the tokens it needs are repeated inside it —
+the only literal colours outside `tokens.css`, and a copy rather than a second source. If the palette
+moves, this moves with it.
+
+**The 404.** It said one sentence and offered a link home. It now states the code in the label
+register — not as a giant numeral, which is the one thing every other 404 does — says in a line that
+nothing is broken on the reader's side, and then lists the whole archive. That is the only useful
+thing a 404 can do here, and the archive is short enough that listing all of it is an answer rather
+than a consolation.
+
+Neither is scored: an XSL result is not a page Lighthouse loads, and a 404 is not the audited route.
+
 ## The tone scale, and why it moved
 
 As originally specified, `--faint` was `#9A9E98`, measuring **2.49:1** on `--paper` — well below the
