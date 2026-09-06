@@ -932,3 +932,44 @@ h1 {
     padding-top: 2.5rem;
     border-top: 1px solid var(--rule);
 }
+
+/* ---------------------------------------------------------------------------
+ * The index numeral.
+ *
+ * The post's place in the archive, in the left margin beside its entry — the
+ * same device as the section numerals inside a post, and the thing that gives
+ * the weighted column's wider margin a job on the index rather than just more
+ * empty space.
+ *
+ * Numbered oldest first, so it is an archive number and not a rank: publishing
+ * a post does not renumber the ones beneath it. It shares the kicker's size,
+ * line-height and tracking, so the two sit on one baseline and read as a single
+ * label row that happens to start out in the margin.
+ *
+ * Only at 90rem and up, where there is a margin to put it in — the same rule
+ * the section numerals follow.
+ * ------------------------------------------------------------------------ */
+
+.index-numeral {
+    display: none;
+}
+
+@media (min-width: 90rem) {
+    .post-index li {
+        position: relative;
+    }
+
+    .index-numeral {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: calc(-1 * var(--numeral-col));
+        width: calc(var(--numeral-col) - 1.25rem);
+        text-align: right;
+        font-family: var(--mono);
+        font-size: var(--fs-utility);
+        line-height: 1.6;
+        letter-spacing: 0.06em;
+        color: var(--faint);
+    }
+}
