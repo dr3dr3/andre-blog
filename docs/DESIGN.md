@@ -120,8 +120,18 @@ Both are licensed under the SIL Open Font License; the licence texts sit next to
 
 ## Layout
 
-Single column, left-aligned, centred in the viewport, measure capped at `62ch` — `56ch` at `90rem` and above, where the type is larger. No sidebar, no
-cards, no hero images, no featured post. Responsive floor is 380px.
+Single column, left-aligned, measure capped at `62ch` — `56ch` at `90rem` and above, where the type
+is larger. No sidebar, no cards, no hero images, no featured post. Responsive floor is 380px.
+
+**The column is centred below `90rem` and weighted right above it.** Centred, the two margins are
+equal and both are leftover space. Weighted, the left margin becomes a place — the one the section
+numerals already occupy — and the page reads as composed rather than as a column that happened to
+land in the middle. It is the structural answer to the empty margin that this document has been
+demanding since the type scale moved.
+
+The shift is `padding-left` on `body`, not a margin on each region, so the header, main and footer
+stay locked to each other and their hairlines keep lining up. Content centres inside the padding
+box, so the column moves by half the padding added: `8rem` of padding, `4rem` of shift.
 
 The header has two forms. Everywhere except the home page it is the compact one: the name on the
 left, text links on the right, a hairline under it. The home page gets the **masthead** — the name
@@ -213,6 +223,62 @@ Four more were drawn and rejected, recorded so they are not re-proposed:
   reviving it must **pre-rasterise the noise rather than generate it at paint time**, and must carry
   a Lighthouse number before and after. The cheaper half-step, untested: keep the 240 × 240 grain
   and drop the mottle, which was 25× the pixel count and did most of the damage.
+
+## The hairline grammar
+
+Hairlines are the only decoration on the site, and for a long time they were all the same object: 1px
+of `--rule`, full width, everywhere. That made the page's structure illegible — a boundary between
+the site's chrome and its content looked identical to a separator between two list items. Three
+tiers now:
+
+| Tier | Form | Where |
+| --- | --- | --- |
+| **Region boundary** | 1.5px `--rule` | Under the compact header, over the footer. Content ends, chrome begins. |
+| **Content rule** | 1px `--rule` | Everything else — artefact borders, blockquote edges. |
+| **Runs out** | 1px, `--rule` to transparent | The index kicker, after the date and outcome. |
+
+The third is the one that carries meaning rather than weight. A kicker *names* the entry beneath it;
+it does not enclose it, and a rule that ends square implies an edge that is not there. Running it out
+says the label is trailing off into the entry, which is what it is doing.
+
+The masthead carries no rule at all — see Layout above.
+
+## The wordmark
+
+`André` is set at 700, `Dreyer` at 500. Both faces are loaded variable across 400–700 and the site
+used exactly one weight of that range, so the axis was already paid for and sitting idle. The given
+name takes the weight because the site is a person writing, not a masthead of record.
+
+Applied in both header forms, so the compact header on a post page and the masthead on the home page
+are the same mark at two sizes.
+
+## Optical size, driven
+
+Newsreader carries an optical size axis of 6–72. The site set `font-optical-sizing: auto`, which only
+lets the axis follow font-size. The index summary and the masthead line now set `opsz 60` explicitly,
+which gives them a finer display cut at the *same* size as the body text beneath them — a second
+texture out of a file already downloaded, for no bytes.
+
+## Selection
+
+Selecting text is the one interaction a reading site actually gets, and it was answered in the
+browser's default blue — the only colour on the site nobody chose. It is now `--info` on `--paper`.
+
+`--info` rather than `--ok`: this is the interface responding to the reader, which is the job `--info`
+already holds on links and the focus ring. It is not a status, and the rule that colour labels
+`outcome.status` and nothing else still stands.
+
+## Print
+
+The site had no `@media print` rules at all. It has them now: black on white, points rather than
+pixels, navigation and the skip link dropped, link destinations spelled out after the link because
+paper cannot be clicked, surfaces stripped of fill because a printer renders `--wash` as a grey box
+that costs ink and separates nothing, and `break-after: avoid-page` on every heading so none is left
+stranded at the foot of a sheet. The section numerals move inline, since a printed page has no margin
+to spare. The metrics strip prints — it is the one thing on this site no other blog has.
+
+This is free by construction: print media is not evaluated by Lighthouse. See
+[PERFORMANCE.md](PERFORMANCE.md).
 
 ## The tone scale, and why it moved
 

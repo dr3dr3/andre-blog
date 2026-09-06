@@ -55,12 +55,15 @@ const url = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
             {
                 masthead ? (
                     <div class="masthead">
-                        <h1 class="masthead-name">André Dreyer</h1>
+                        {/* The given name carries the weight. JetBrains Mono is loaded
+                            variable across 400-700 and the site used exactly one of
+                            those weights, so the axis was already paid for. */}
+                        <h1 class="masthead-name"><b>André</b> Dreyer</h1>
                         <p class="masthead-line">{description}</p>
                     </div>
                 ) : (
                     <a class="site-name" href="/">
-                        André Dreyer
+                        <b>André</b> Dreyer
                     </a>
                 )
             }

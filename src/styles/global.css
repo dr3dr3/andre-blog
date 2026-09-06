@@ -124,6 +124,15 @@ a {
     text-underline-offset: 0.18em;
 }
 
+/* Selecting text is the one interaction a reading site gets, and it was
+ * answered in the browser's default blue — the only colour here nobody chose.
+ * --info rather than --ok: this is the interface responding to the reader,
+ * the same job it already does on links and the focus ring, not a status. */
+::selection {
+    background: var(--info);
+    color: var(--paper);
+}
+
 :focus-visible {
     outline: 2px solid var(--info);
     outline-offset: 3px;
@@ -167,7 +176,10 @@ a {
     justify-content: space-between;
     gap: 0.5rem 1rem;
     padding: 4.5rem 0 0.75rem;
-    border-bottom: 1px solid var(--rule);
+    /* A region boundary, not a content rule. See "The hairline grammar" in
+     * docs/DESIGN.md: 1.5px separates the page's chrome from its content, 1px
+     * separates content from content, and a label's rule runs out instead. */
+    border-bottom: 1.5px solid var(--rule);
 }
 
 /* Home only. The name is the largest thing on the page there, because the
@@ -191,10 +203,18 @@ a {
     border-bottom: 0;
 }
 
+/* The given name carries the weight, the surname sits back. Both faces are
+ * loaded variable across 400-700 and the site used one weight of that range,
+ * so the axis costs nothing it was not already paying. */
 .masthead-name {
     font-size: var(--fs-masthead);
     letter-spacing: -0.035em;
     line-height: 1.1;
+}
+
+.masthead-name b,
+.site-name b {
+    font-weight: 700;
 }
 
 .masthead-line {
@@ -239,7 +259,8 @@ main {
 .site-footer {
     margin-top: 5rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--rule);
+    /* The strongest boundary on the page — content ends, site chrome begins. */
+    border-top: 1.5px solid var(--rule);
 }
 
 .site-footer p {
@@ -330,6 +351,15 @@ main {
     text-decoration-color: var(--info);
 }
 
+/* Newsreader carries an optical size axis of 6-72 and the site only ever let
+ * it follow font-size. Driven to the display end, the summary gets a finer cut
+ * at the same size as the body beneath it — a second texture out of a file
+ * already downloaded. */
+.summary,
+.masthead-line {
+    font-variation-settings: 'opsz' 60;
+}
+
 .summary {
     margin-top: 0.5rem;
     color: var(--muted);
@@ -359,7 +389,10 @@ main {
     content: '';
     flex: 1 1 auto;
     height: 1px;
-    background: var(--rule);
+    /* Runs out rather than stopping. The kicker names the entry beneath it; it
+     * is not a box around it, and a rule that ends square implies an edge that
+     * is not there. */
+    background: linear-gradient(90deg, var(--rule), transparent);
 }
 
 /* ---------------------------------------------------------------------------
@@ -417,6 +450,27 @@ h1 {
  *
  * Plain digits, no section sign: `§` is a citation mark, and nothing here cites
  * a section. */
+/* ---------------------------------------------------------------------------
+ * The column stops being centred.
+ *
+ * Centred, the two margins are equal and both are leftover. Weighted right, the
+ * left margin becomes a place — the one the section numerals already live in —
+ * and the page reads as composed rather than as a column that happened to land
+ * in the middle. Only at 90rem and above, which is the one breakpoint where
+ * there is margin to spend; below it the column still fills the viewport.
+ *
+ * Done with padding on `body` rather than a margin on each region, so the three
+ * of them stay locked to each other and their hairlines keep lining up. Content
+ * is centred inside the padding box, so the shift is half the padding added:
+ * 8rem of padding moves the column 4rem right.
+ * ------------------------------------------------------------------------ */
+
+@media (min-width: 90rem) {
+    body {
+        padding-left: calc(var(--gutter) + 8rem);
+    }
+}
+
 @media (min-width: 90rem) {
     .prose h2 {
         display: flex;
@@ -695,5 +749,161 @@ h1 {
 
     main {
         padding-top: 2.5rem;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * Print.
+ *
+ * A technical post is a thing people print, or save to PDF, and until now the
+ * site had no opinion about what happened when they did. It costs nothing to
+ * have one: print media is not evaluated by Lighthouse, so this is the one
+ * place on the site where craft is free by construction. See
+ * docs/PERFORMANCE.md.
+ *
+ * The principles are the ordinary ones for setting a page: black on white
+ * because a printer has no --paper, points because a page has a physical size,
+ * link destinations spelled out because paper cannot be clicked, and no heading
+ * left stranded at the foot of a sheet.
+ * ------------------------------------------------------------------------ */
+
+@media print {
+    @page {
+        margin: 18mm 16mm 20mm;
+    }
+
+    html,
+    body {
+        background: #fff;
+        color: #000;
+        font-size: 11pt;
+        line-height: 1.5;
+    }
+
+    body {
+        padding: 0;
+    }
+
+    /* The measure is set by @page here, not by the screen's column. */
+    .site-header,
+    main,
+    .site-footer {
+        max-width: none;
+    }
+
+    /* Navigation, the skip link and the focus affordances are all instructions
+     * to a reader who can click. On paper they are noise. */
+    .skip,
+    .site-header nav {
+        display: none;
+    }
+
+    .site-header {
+        border-bottom: 0.5pt solid #999;
+        padding: 0 0 6pt;
+        margin-bottom: 18pt;
+    }
+
+    .masthead-name,
+    .site-name {
+        font-size: 12pt;
+        color: #000;
+    }
+
+    .masthead-line {
+        display: none;
+    }
+
+    h1 {
+        font-size: 20pt;
+        line-height: 1.2;
+    }
+
+    .prose h2 {
+        font-size: 12pt;
+        /* The screen puts the numeral in the margin; a printed page has no
+         * margin to spare, so the flex row and its pull-left are undone. */
+        display: block;
+        margin-left: 0;
+    }
+
+    .prose h2::before {
+        content: counter(section, decimal-leading-zero) ' · ';
+        color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    .prose h2,
+    .prose h3 {
+        break-after: avoid-page;
+        break-inside: avoid-page;
+    }
+
+    p,
+    blockquote,
+    figure,
+    li {
+        orphans: 3;
+        widows: 3;
+    }
+
+    figure,
+    blockquote,
+    .artefact {
+        break-inside: avoid-page;
+    }
+
+    /* Paper cannot be clicked, so a link has to say where it goes. Only in
+     * prose: the nav is gone and the metadata links are the site's own pages. */
+    .prose a {
+        color: #000;
+        text-decoration: underline;
+    }
+
+    .prose a[href^='http']::after {
+        content: ' <' attr(href) '>';
+        font-family: var(--mono);
+        font-size: 8.5pt;
+        word-break: break-all;
+    }
+
+    /* Every surface loses its fill. A printer renders --wash as a grey box that
+     * costs ink and separates nothing. */
+    .artefact,
+    .artefact pre,
+    code,
+    .skip {
+        background: transparent;
+        border-color: #999;
+    }
+
+    .artefact pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 8.5pt;
+    }
+
+    .muted,
+    .summary,
+    .post-meta,
+    .artefact figcaption,
+    .metrics dt,
+    .metrics-note {
+        color: #333;
+    }
+
+    /* The four numbers are the one thing on this site no other blog has, so
+     * they print. The strip becomes a row that survives a narrow page. */
+    .site-footer {
+        border-top: 0.5pt solid #999;
+        margin-top: 24pt;
+        padding-top: 8pt;
+        break-inside: avoid-page;
+    }
+
+    .metrics {
+        gap: 4pt 12pt;
     }
 }
