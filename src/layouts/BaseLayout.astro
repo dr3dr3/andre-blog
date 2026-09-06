@@ -14,9 +14,11 @@ interface Props {
      *  `description` as the line underneath it. Everywhere else keeps the
      *  compact header, because a masthead on a post competes with its title. */
     masthead?: boolean;
+    /** Slug of the generated Open Graph card, without extension. See src/lib/og.ts. */
+    ogSlug?: string;
 }
 
-const { title, description, canonical, masthead = false } = Astro.props;
+const { title, description, canonical, masthead = false, ogSlug = 'home' } = Astro.props;
 const url = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
 ---
 
@@ -48,6 +50,16 @@ const url = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:url" content={url} />
+        <meta property="og:site_name" content="André Dreyer" />
+        <meta property="og:locale" content="en_AU" />
+        <meta property="og:image" content={new URL(`/og/${ogSlug}.png`, Astro.site).href} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={title} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={new URL(`/og/${ogSlug}.png`, Astro.site).href} />
     </head>
     <body>
         <a class="skip" href="#main">Skip to content</a>

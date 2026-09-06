@@ -20,7 +20,12 @@ const { Content } = await render(post);
 const minutes = readingMinutes(post.body ?? '');
 ---
 
-<BaseLayout title={post.data.title} description={post.data.summary} canonical={post.data.canonical}>
+<BaseLayout
+    title={post.data.title}
+    description={post.data.summary}
+    canonical={post.data.canonical}
+    ogSlug={post.id}
+>
     <article>
         <h1>{post.data.title}</h1>
         <PostMeta data={post.data} minutes={minutes} />
