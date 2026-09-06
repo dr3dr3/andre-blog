@@ -280,6 +280,37 @@ to spare. The metrics strip prints — it is the one thing on this site no other
 This is free by construction: print media is not evaluated by Lighthouse. See
 [PERFORMANCE.md](PERFORMANCE.md).
 
+## Social cards
+
+The site set `og:title`, `og:description` and `og:url` and no `og:image` at all, so every share of it
+was a grey box of text. There is now a card per post and one for the home page, generated at build
+time into `/og/<slug>.png` at 1200 × 630.
+
+The post card is the index entry at poster size: the kicker in the label register with its hairline
+running out to the right, the title set large in the mono face, and a footer rule over the domain and
+the archetype. The archetype takes the post's **status colour**, so `shipped` is `--ok` and
+`experiment` stays uncoloured — the same rule the page follows. The home card is the wordmark and the
+site description over the same footer.
+
+Set entirely in JetBrains Mono, which is both the site's title face and the reason no layout engine
+is needed: a monospace advance makes line breaking arithmetic, so the title wraps and steps down
+through 64 / 56 / 48 / 42px until it fits three lines, with no measurement and no `satori`.
+
+Two build-time dependencies, nothing at runtime. `wawoff2` decompresses the committed woff2 subset
+because no rasteriser reads that format, and `@resvg/resvg-js` turns the SVG into a PNG. Three
+things about that pipeline are worth knowing before touching it, because each one fails silently:
+
+- **`fontBuffers` renders nothing.** resvg-js 2.6.2 accepts the option, drops every glyph, and still
+  returns a valid PNG. Use `fontFiles`.
+- **Register one subset, not two.** Both `latin` and `latin-ext` claiming the family made resvg pick
+  latin-ext for the whole run and render every lowercase glyph as `.notdef`. `latin` alone covers
+  U+0000–00FF and U+2000–206F, which is an accented name, an em dash and curly quotes.
+- **`font-weight` is ignored.** resvg draws the variable font's default instance, so the wordmark's
+  weight contrast is synthesised with a stroke in the fill colour.
+
+The cards are static files that no page loads, so they cost nothing against
+[PERFORMANCE.md](PERFORMANCE.md).
+
 ## The tone scale, and why it moved
 
 As originally specified, `--faint` was `#9A9E98`, measuring **2.49:1** on `--paper` — well below the

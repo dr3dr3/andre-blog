@@ -34,6 +34,7 @@ call, and deploying is not the same as publishing.
 | Content | MDX in `src/content/posts/`, no CMS |
 | Styling | Plain CSS with custom properties. No Tailwind, no framework. |
 | JS | None on content pages except Vercel Analytics |
+| Social cards | `og:image` per post plus the home page, generated at build. See [docs/DESIGN.md](docs/DESIGN.md). |
 | Package manager | pnpm, pinned via `packageManager` |
 | Hosting | Vercel, Hobby, deployed by the Git integration |
 | DNS | Route 53, set by hand. See [docs/INFRA.md](docs/INFRA.md) — the zone also carries mail. |

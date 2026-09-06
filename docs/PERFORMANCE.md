@@ -85,7 +85,8 @@ in [DESIGN.md](DESIGN.md). The performance half of it:
 
 - **Free on the page** — typography, composition, the hairlines, copy, `::selection`. CSS the site
   already ships, costing a few hundred bytes inside an already-inlined stylesheet.
-- **Free because Lighthouse never sees it** — the print stylesheet, Open Graph images, the RSS
-  feed, the favicon, `/404`. Lighthouse scores the rendered article page; none of these are on it.
+- **Free because Lighthouse never sees it** — the print stylesheet and the Open Graph cards, both
+  now shipped; the RSS feed, the favicon and `/404`, not yet. Lighthouse scores the rendered article
+  page. Print media is not evaluated at all, and the cards are static files that no page loads.
 - **Costs a budget** — raster images, motion, anything computed at paint time, any client JS. Not
   forbidden, but it comes with a before-and-after number or it does not ship.
