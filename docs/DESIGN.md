@@ -133,6 +133,20 @@ The shift is `padding-left` on `body`, not a margin on each region, so the heade
 stay locked to each other and their hairlines keep lining up. Content centres inside the padding
 box, so the column moves by half the padding added: `8rem` of padding, `4rem` of shift.
 
+The margin it opens is not empty. Each index entry carries its **archive number** in it, in the same
+label register and on the same baseline as the kicker beside it, so the two read as one label row
+that happens to begin out in the margin. It is the same device as the section numerals inside a
+post, and it is what gives the wider margin a job on the index rather than just more space.
+
+The number is the post's place in publication order, **oldest first**. That makes it an archive
+number rather than a rank: publishing a post does not renumber the ones beneath it, which counting
+down the displayed list would. The index reads newest first and numbers downward, which is what an
+archive does.
+
+Rendered only at `90rem` and above, like the section numerals, and `aria-hidden` — it is a visual
+index device, and read aloud before every date it would be noise. Both the index and the 404 render
+entries through one `PostEntry` component, so the two listings cannot drift.
+
 The header has two forms. Everywhere except the home page it is the compact one: the name on the
 left, text links on the right, a hairline under it. The home page gets the **masthead** — the name
 set at `--fs-masthead`, the page's own description on the line beneath it, then the nav, stacked and
