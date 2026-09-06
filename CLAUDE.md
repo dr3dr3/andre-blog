@@ -17,7 +17,11 @@ Vercel settings by hand — those are configured outside this repo, see [docs/IN
 ## Git
 
 You commit, merge and push, including to `main`. A push to `main` deploys, so the last thing you do
-before pushing is run `pnpm build` and `pnpm check` — do not push a red build. Branch, then merge
+before pushing is run `pnpm build` and `pnpm check` — do not push a red build. The site holds **100
+in all four Lighthouse categories** and a change may not drop any of them; Lighthouse needs Chrome
+and cannot run from a session, so anything touching paint, bytes on the critical path or the
+document head gets flagged for André to measure rather than pushed on the assumption it is free.
+See [docs/PERFORMANCE.md](docs/PERFORMANCE.md). Branch, then merge
 back with `--no-ff`; do not commit directly on `main`. Never force-push and never rewrite published
 history. `draft: false` remains the one thing you do not decide: a post going public is André's
 call, and deploying is not the same as publishing.
@@ -50,6 +54,7 @@ reading-progress bars · syntax highlighting · share buttons · an author photo
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phase 2 and beyond. All not-now. |
 | [docs/INFRA.md](docs/INFRA.md) | Vercel and DNS, as configured. Read before touching either. |
 | [docs/METRICS.md](docs/METRICS.md) | What the four footer numbers count, and what they refuse to answer. |
+| [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | The Lighthouse budget. 100 in all four, and what is known to break it. |
 
 ## The writing loop
 
