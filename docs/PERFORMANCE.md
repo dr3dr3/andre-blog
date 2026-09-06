@@ -85,8 +85,10 @@ in [DESIGN.md](DESIGN.md). The performance half of it:
 
 - **Free on the page** — typography, composition, the hairlines, copy, `::selection`. CSS the site
   already ships, costing a few hundred bytes inside an already-inlined stylesheet.
-- **Free because Lighthouse never sees it** — the print stylesheet and the Open Graph cards, both
-  now shipped; the RSS feed, the favicon and `/404`, not yet. Lighthouse scores the rendered article
-  page. Print media is not evaluated at all, and the cards are static files that no page loads.
+- **Free because Lighthouse never sees it** — the print stylesheet, the Open Graph cards, the styled
+  RSS feed and the 404, all now shipped. Lighthouse scores the rendered article page: print media is
+  not evaluated at all, the cards are static files no page loads, an XSL result is not a page it
+  loads either, and the 404 is not the audited route. Only the favicon is left, and it is already
+  good.
 - **Costs a budget** — raster images, motion, anything computed at paint time, any client JS. Not
   forbidden, but it comes with a before-and-after number or it does not ship.

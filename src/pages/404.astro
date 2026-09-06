@@ -1,12 +1,52 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Outcome from '../components/Outcome.astro';
+import { getPosts } from '../lib/posts';
+import { isoDate } from '../lib/format';
+
+/*
+ * A 404 is the one page where nobody is mid-article and nothing is interrupted,
+ * so it can afford to be useful rather than apologetic. It says what happened
+ * in one line and then does the only helpful thing available: shows what is
+ * actually here. The archive is short enough that listing all of it is a real
+ * answer rather than a consolation link.
+ */
+const posts = await getPosts();
 ---
 
 <BaseLayout title="Not found — André Dreyer" description="That page does not exist.">
     <article>
+        <p class="notfound-code">404</p>
         <h1>Not found</h1>
         <div class="prose">
-            <p>That page does not exist. <a href="/">The posts are here.</a></p>
+            <p>
+                That address does not exist here — mistyped, or something that moved. Nothing is
+                broken on your side. Everything that has been published is below.
+            </p>
         </div>
     </article>
+
+    <ul class="post-index notfound-index">
+        {
+            posts.map((post) => (
+                <li>
+                    <p class="index-meta">
+                        <span>
+                            <time datetime={isoDate(post.data.published)}>
+                                {isoDate(post.data.published)}
+                            </time>
+                            <span class="sep"> · </span>
+                            <Outcome
+                                status={post.data.outcome.status}
+                                was={post.data.outcome.was}
+                                changed={post.data.outcome.changed}
+                            />
+                        </span>
+                    </p>
+                    <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+                    <p class="summary">{post.data.summary}</p>
+                </li>
+            ))
+        }
+    </ul>
 </BaseLayout>
