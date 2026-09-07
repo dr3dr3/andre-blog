@@ -12,21 +12,34 @@ Emulated Moto G Power, Slow 4G throttling, Lighthouse 13.4.1, `https://andredrey
 
 | Category | Score | Captured |
 | --- | --- | --- |
-| Performance | **100** | 2026-09-06 |
-| Accessibility | not yet captured | — |
-| Best Practices | not yet captured | — |
-| SEO | not yet captured | — |
+| Performance | **100** | 2026-09-07 |
+| Accessibility | **100** | 2026-09-07 |
+| Best Practices | **100** | 2026-09-07 |
+| SEO | **100** | 2026-09-07 |
+| Agentic Browsing | 3/3 | 2026-09-07 |
 
-| Metric | Value |
-| --- | --- |
-| First Contentful Paint | 0.8s |
-| Largest Contentful Paint | 1.7s |
-| Total Blocking Time | 30ms |
-| Cumulative Layout Shift | 0.013 |
-| Speed Index | 1.0s |
+Metrics, from the 2026-09-06 capture. The run that produced the four scores above reported the
+category totals only, so these are last known rather than current — replace them from a run that
+shows them, and do not copy today's date onto them.
 
-The three uncaptured categories are uncaptured, not assumed. Fill them in from a real run; do not
-write a number here that nobody has seen.
+| Metric | Value | Captured |
+| --- | --- | --- |
+| First Contentful Paint | 0.8s | 2026-09-06 |
+| Largest Contentful Paint | 1.7s | 2026-09-06 |
+| Total Blocking Time | 30ms | 2026-09-06 |
+| Cumulative Layout Shift | 0.013 | 2026-09-06 |
+| Speed Index | 1.0s | 2026-09-06 |
+
+The four scores above cover everything shipped on 2026-09-06 and 2026-09-07: the composition and
+craft batch, the Open Graph cards, the styled feed, the 404 and the index numerals. So the budget
+has been held across five design commits rather than merely set.
+
+**Agentic Browsing** is PageSpeed's newer category and is not part of the rule as written. It passes
+3/3 today. Recorded because it is measured, not because it is a target.
+
+**The Chrome User Experience Report has no field data for this site**, and says so on the report. It
+needs real visitor traffic before it reports anything, and its absence does not affect the score —
+the lab run is the whole number. An empty Core Web Vitals panel is not a failure.
 
 ## How to measure
 
