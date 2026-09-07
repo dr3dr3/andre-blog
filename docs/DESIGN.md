@@ -325,6 +325,21 @@ things about that pipeline are worth knowing before touching it, because each on
 The cards are static files that no page loads, so they cost nothing against
 [PERFORMANCE.md](PERFORMANCE.md).
 
+### Checking them
+
+`pnpm build && pnpm check:og` verifies every page in `dist`: that the required `og:*` and `twitter:*`
+tags are present, that `og:image` is absolute — a relative one is unresolvable to a scraper and is
+the classic way this breaks — that the file it names was actually emitted, that it really is
+1200 × 630, and that no generated card is left unreferenced. It prints the tags per page, so they can
+be read rather than grepped out of minified HTML.
+
+It cannot tell you whether LinkedIn will show the card, because that depends on LinkedIn's cache
+rather than on the page. The site published `og:*` tags with **no image** for its whole life until
+2026-09-06, so anything that scraped it before then holds a cached result with no image and will keep
+serving that. Force a re-scrape per URL in the
+[LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/) before sharing a link, or the
+first share of every existing URL will still be a grey box.
+
 ## The feed, and the 404
 
 Two pages a reader can land on that were never designed.
