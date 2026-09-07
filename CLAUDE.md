@@ -72,5 +72,5 @@ rounds maximum, then it goes to André regardless of unresolved objections. Brai
 
 ## Commands
 
-`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check`. `astro dev` does not work when the repo
+`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check` · `pnpm check:og` (after a build — verifies the social cards). `astro dev` does not work when the repo
 sits on a Windows drive — see "Local development" in the [README](README.md).
