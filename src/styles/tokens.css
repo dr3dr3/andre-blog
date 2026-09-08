@@ -55,6 +55,17 @@
     --fs-post-title: 1.625rem; /* 26px */
     --fs-masthead: 1.75rem; /* 28px — the name, home page only */
     --fs-metric: 1rem; /* 16px — the four values in the footer strip */
+
+    /* In-prose structure. These were literals in global.css and never stepped,
+     * so a section heading rendered at 17px against 21px body on the display
+     * the whole layout was composed for — a heading smaller than the paragraph
+     * it heads, which is not a hierarchy. The floor is h2 >= 1.15x body at
+     * every step. h3 sits at body size and reads as a heading on the face
+     * change alone, which is the same argument the titles already make. */
+    --fs-h2: 1.25rem; /* 20px — 1.18x body */
+    --fs-h3: 1.0625rem; /* 17px — body size, mono and --muted */
+    --fs-artefact: 0.875rem; /* 14px — the evidence, not a footnote */
+
     --lh-body: 1.7;
 
     /* Layout */
@@ -99,6 +110,22 @@
 @media (min-width: 40rem) {
     :root {
         --fs-body: 1.125rem; /* 18px */
+        --fs-h2: 1.3125rem; /* 21px — 1.17x body */
+        --fs-h3: 1.125rem; /* 18px */
+        --fs-artefact: 0.9375rem; /* 15px */
+
+        /* The measure steps here, not at 90rem with the composition.
+         *
+         * 62ch of Newsreader wraps prose at about 89 characters, which this
+         * document has called a defect since the type scale moved — and the
+         * correction used to ship only at 90rem, bundled with the numerals and
+         * the weighted column for implementation convenience. Readability and
+         * ornament do not belong on one breakpoint: every 1280- and 1366-wide
+         * laptop, every unmaximised window and every 200% zoom session got the
+         * long line, and because `rem` queries resolve against the reader's own
+         * base font, the breakpoint retreated for exactly the low-vision
+         * readers who needed the short line most. */
+        --measure: 54ch; /* about 77 characters */
     }
 }
 
@@ -110,7 +137,11 @@
         --fs-post-title: 2.125rem; /* 34px */
         --fs-masthead: 2.5rem; /* 40px */
         --fs-metric: 1.125rem; /* 18px */
-        --measure: 56ch;
+        --fs-h2: 1.5625rem; /* 25px — 1.19x body */
+        --fs-h3: 1.3125rem; /* 21px */
+        --fs-artefact: 1.125rem; /* 18px */
+        /* --measure holds at 54ch from the 40rem step; the line length is a
+         * reading decision and does not change because the margin grew. */
         --label-col: 84px;
         --numeral-col: 5.75rem; /* section numerals, in the margin beside an h2 */
     }
