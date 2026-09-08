@@ -14,7 +14,8 @@
         "check": "astro check",
         "astro": "astro",
         "publish-post": "node scripts/publish-post.mjs",
-        "check:og": "node scripts/check-og.mjs"
+        "check:og": "node scripts/check-og.mjs",
+        "check:content": "node scripts/check-content.mjs"
     },
     "dependencies": {
         "@astrojs/mdx": "^7.0.7",

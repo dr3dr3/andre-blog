@@ -338,3 +338,15 @@ nothing.
 11. **`summary` under 180 characters.**
 12. **`title` under 70 characters.**
 13. **`draft: true` still set.** Only André changes it.
+
+## Scaffolding never ships
+
+`[[TK: …]]` and the `.placeholder` style are drafting tools. They are for the repository, not for
+readers, and on 2026-09-08 both were found live on `/about`, which served the sentence "Placeholder.
+Scaffolding, not André's writing — replace the paragraph below before this site is shared anywhere"
+on a public site with social cards generated for sharing.
+
+`pnpm check:content` now refuses a build containing either, and it runs before every push. The one
+exemption is an `<Artefact>`: that is how this site quotes evidence verbatim, and one published post
+quotes its own TK markers as the artefact. A marker in prose is a leak; a marker inside an artefact
+is the subject.

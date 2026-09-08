@@ -17,7 +17,8 @@ Vercel settings by hand — those are configured outside this repo, see [docs/IN
 ## Git
 
 You commit, merge and push, including to `main`. A push to `main` deploys, so the last thing you do
-before pushing is run `pnpm build` and `pnpm check` — do not push a red build. The site holds **100
+before pushing is run `pnpm build`, `pnpm check`, `pnpm check:og` and `pnpm check:content` — do not
+push a red build, and never push scaffolding. The site holds **100
 in all four Lighthouse categories** and a change may not drop any of them; Lighthouse needs Chrome
 and cannot run from a session, so anything touching paint, bytes on the critical path or the
 document head gets flagged for André to measure rather than pushed on the assumption it is free.
@@ -72,5 +73,5 @@ rounds maximum, then it goes to André regardless of unresolved objections. Brai
 
 ## Commands
 
-`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check` · `pnpm check:og` (after a build — verifies the social cards). `astro dev` does not work when the repo
+`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check` · `pnpm check:og` and `pnpm check:content` (both after a build — the social cards, and that no drafting scaffolding reaches a reader). `astro dev` does not work when the repo
 sits on a Windows drive — see "Local development" in the [README](README.md).
