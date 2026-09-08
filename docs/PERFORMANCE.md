@@ -1,6 +1,7 @@
 # Performance
 
-**The rule: 100 in all four Lighthouse categories. A change that drops any of them does not ship.**
+**The rule: 100 in all four Lighthouse categories, and the reading conditions below. A change that
+drops any of them does not ship.**
 
 Performance, Accessibility, Best Practices, SEO. Not "90-something", not "green". The site is a
 static page of text with no framework, no CMS and no client JS beyond analytics — there is no
@@ -40,6 +41,25 @@ has been held across five design commits rather than merely set.
 **The Chrome User Experience Report has no field data for this site**, and says so on the report. It
 needs real visitor traffic before it reports anything, and its absence does not affect the score —
 the lab run is the whole number. An empty Core Web Vitals panel is not a failure.
+
+## The reading conditions
+
+The score is the floor, not the measure. It is taken on one route with very little content, at one
+viewport, by a machine that does not read — so on its own it will happily certify a page nobody can
+read comfortably. On 2026-09-08 it did exactly that: a section heading was rendering smaller than the
+paragraph it headed, and the measure ran to 89 characters on every laptop. Both cost zero Lighthouse
+points. Both had been shipping for weeks.
+
+These bind at every width, not only the one the layout was composed for.
+
+| Condition | Where it is set |
+| --- | --- |
+| The measure stays inside 45–75 characters | `--measure`, stepped at `40rem` |
+| A section heading is never smaller than the body it heads | `--fs-h2` ≥ 1.15× `--fs-body` |
+| Evidence is never the smallest text on the page | `--fs-artefact` |
+| Anything a reader acts on clears a 44px target | index titles, nav |
+| Every listing exposes headings | `PostEntry` renders `h2` |
+| Every state a screen reader gets is visible too | `aria-current` has a visible style |
 
 ## How to measure
 

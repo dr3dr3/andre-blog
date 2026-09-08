@@ -29,10 +29,26 @@ measured against them first.
 5. **Nothing is added behind the text.** Sixteen decorative grounds were drawn and rejected across
    one session, and the last of them was measured shipping and pulled. Personality here comes from
    composition and craft: type, hairlines, the wordmark, the margin, what happens at the edges.
-6. **100 in all four Lighthouse categories, and a change that touches paint gets measured, not
-   assumed.** See [PERFORMANCE.md](PERFORMANCE.md). This is the constraint that decides where
-   character can live, and it is why the print stylesheet, the social cards, the feed and the 404
-   carry as much of it as the article page does.
+6. **100 in all four Lighthouse categories is the floor, not the measure.** A change that touches
+   paint gets measured rather than assumed — see [PERFORMANCE.md](PERFORMANCE.md) — and that is why
+   the print stylesheet, the social cards, the feed and the 404 carry as much craft as the article
+   page does.
+
+   But a green score says almost nothing about whether a page can be *read*. It is taken on one
+   route with very little content, at one viewport, by a machine that does not read. Written as a
+   score alone this rule was self-serving: it vetoed one background texture and waved everything
+   else through, while a section heading rendered smaller than the paragraph it headed and the
+   measure ran to 89 characters on every laptop — both free of Lighthouse cost, both found by a
+   critique rather than by the rule. So the budget carries **reading conditions**, and they bind at
+   every width rather than only the one the layout was composed for:
+
+   - The measure stays inside 45–75 characters at every breakpoint above the viewport floor.
+   - A section heading is never smaller than the body text it heads.
+   - Evidence — the artefact — is never the smallest text on the page.
+   - Anything a reader must act on clears a 44px target.
+   - Every listing exposes headings, and every state a screen reader gets is visible too.
+
+   A condition that can fail is what stops a green score standing in for a design.
 
 ## What is where
 
@@ -297,6 +313,12 @@ tiers now:
 | **Region boundary** | 1.5px `--rule` | Under the compact header, over the footer. Content ends, chrome begins. |
 | **Content rule** | 1px `--rule` | Everything else — artefact borders, blockquote edges. |
 | **Runs out** | 1px, `--rule` to transparent | The index kicker, after the date and outcome. |
+| **Emphasis** | 2px, a status hue | `.artefact--failure` and the `:focus-visible` ring. |
+
+The fourth tier is not structure and does not separate anything — it marks. It is the only place a
+line takes a hue, and both uses are a signal rather than a boundary: this artefact is the failure,
+this element has focus. It went undocumented until 2026-09-08, which is how a grammar acquires a
+dialect.
 
 The third is the one that carries meaning rather than weight. A kicker *names* the entry beneath it;
 it does not enclose it, and a rule that ends square implies an edge that is not there. Running it out

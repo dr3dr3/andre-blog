@@ -73,6 +73,7 @@
     --gutter: 1.5rem;
     --label-col: 74px; /* metadata block label column */
     --radius: 6px;
+    --radius-tight: 3px; /* inline chips and focus rings — see DESIGN.md */
 }
 
 @media (prefers-color-scheme: dark) {

@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Outcome from './Outcome.astro';
-import { isoDate, longDate } from '../lib/format';
+import { isoDate } from '../lib/format';
 
 interface Props {
     data: CollectionEntry<'posts'>['data'];
@@ -58,7 +58,7 @@ const { data, minutes } = Astro.props;
             data.updated && (
                 <>
                     <span class="sep"> · </span>updated{' '}
-                    <time datetime={isoDate(data.updated)}>{longDate(data.updated)}</time>
+                    <time datetime={isoDate(data.updated)}>{isoDate(data.updated)}</time>
                 </>
             )
         }

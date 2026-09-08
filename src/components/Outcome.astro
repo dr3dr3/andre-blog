@@ -1,5 +1,5 @@
 ---
-import { isoDate, longDate } from '../lib/format';
+import { isoDate } from '../lib/format';
 
 type Status = 'shipped' | 'abandoned' | 'still-running' | 'experiment';
 
@@ -25,7 +25,7 @@ const { status, was, changed } = Astro.props;
         <>
             {' '}
             <time class="outcome-changed" datetime={isoDate(changed)}>
-                {longDate(changed)}
+                {isoDate(changed)}
             </time>
         </>
     )
