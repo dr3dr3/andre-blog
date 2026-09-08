@@ -4,21 +4,9 @@
  * typed in the file rather than the timezone of whatever machine ran the build.
  */
 
-const LONG = new Intl.DateTimeFormat('en-AU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-});
-
 /** `2026-09-14` — for `<time datetime>` and the metadata block. */
 export function isoDate(date: Date): string {
     return date.toISOString().slice(0, 10);
-}
-
-/** `14 September 2026` — for prose. */
-export function longDate(date: Date): string {
-    return LONG.format(date);
 }
 
 /**
