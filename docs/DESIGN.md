@@ -178,7 +178,7 @@ Measured against the relevant ground. `--rule` and `--wash` are surfaces, not te
 | Body | Newsreader (variable) | 17px, 18px ≥ 40rem | 21px | line-height 1.7, optical sizing auto |
 | Section heading | JetBrains Mono 500 | 20px, 21px ≥ 40rem | 25px | `.prose h2`, tracking `-0.025em` |
 | Sub-heading | JetBrains Mono 500 | 17px, 18px ≥ 40rem | 21px | `.prose h3`, `--muted` |
-| Artefact | JetBrains Mono | 14px, 15px ≥ 40rem | 18px | the evidence blocks |
+| Artefact | JetBrains Mono | 14px, 15px ≥ 40rem | 18px | the evidence blocks, wrapped not scrolled |
 | Metric value | JetBrains Mono 500 | 16px | 18px | the four footer numbers, tracking `-0.02em` |
 | Utility | JetBrains Mono | 11.5px | 12.5px | metadata, dates, tags, footer |
 
@@ -190,6 +190,13 @@ smaller than the paragraph it headed, which is not a hierarchy, and left the sec
 margin decorating a heading a reader could not find while skimming. The artefact — the site's
 evidence, and the thing `perks` in [READERS.md](READERS.md) comes for — rendered at 13px beside 21px
 prose.
+
+**Artefacts wrap; they never scroll sideways.** Evidence a reader has to drag horizontally to finish
+a sentence is evidence they will not read. The longest line in the archive is 103 characters against
+about 54 that fit at 18px, so more than half of it sat off-screen — and raising the artefact from
+13px to 18px, to stop the evidence being the smallest text on the page, made the clipping worse
+before it made anything better. The print stylesheet had reached this conclusion already; the screen
+had not. Both wrap now.
 
 **The floor is h2 ≥ 1.15× body at every step.** `h3` sits at body size and reads as a heading on the
 face change alone, which is the same argument the titles already make. Anything set in prose belongs
