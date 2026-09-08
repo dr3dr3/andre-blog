@@ -11,25 +11,39 @@ excuse available, and the moment a 98 is acceptable the next 98 is too.
 
 Emulated Moto G Power, Slow 4G throttling, Lighthouse 13.4.1, `https://andredreyer.com/`.
 
-| Category | Score | Captured |
-| --- | --- | --- |
-| Performance | **100** | 2026-09-07 |
-| Accessibility | **100** | 2026-09-07 |
-| Best Practices | **100** | 2026-09-07 |
-| SEO | **100** | 2026-09-07 |
-| Agentic Browsing | 3/3 | 2026-09-07 |
+| Category | Mobile | Desktop | Captured |
+| --- | --- | --- | --- |
+| Performance | **100** | **100** | 2026-09-08 |
+| Accessibility | **100** | **100** | 2026-09-08 |
+| Best Practices | **100** | **100** | 2026-09-08 |
+| SEO | **100** | **100** | 2026-09-08 |
+| Agentic Browsing | 3/3 | — | 2026-09-07 (PageSpeed only) |
 
-Metrics, from the 2026-09-06 capture. The run that produced the four scores above reported the
-category totals only, so these are last known rather than current — replace them from a run that
-shows them, and do not copy today's date onto them.
+Run with `pnpm lighthouse` against production, Lighthouse 13.4.1. It covers everything shipped in the
+2026-09-08 batch: the About fix, the prose type scale, the measure step, heading semantics, read
+next, the outcome glossary and the rule 6 reframe.
 
-| Metric | Value | Captured |
+| Metric | Mobile (2 runs) | Desktop |
 | --- | --- | --- |
-| First Contentful Paint | 0.8s | 2026-09-06 |
-| Largest Contentful Paint | 1.7s | 2026-09-06 |
-| Total Blocking Time | 30ms | 2026-09-06 |
-| Cumulative Layout Shift | 0.013 | 2026-09-06 |
-| Speed Index | 1.0s | 2026-09-06 |
+| First Contentful Paint | 0.8–1.2s | 0.2s |
+| Largest Contentful Paint | 1.2–1.7s | 0.3s |
+| Total Blocking Time | 0–20ms | 0ms |
+| Cumulative Layout Shift | 0.028–0.048 | 0.006 |
+| Speed Index | 1.4–2.5s | 0.4s |
+
+**Ranges, not values, because a single run from here is noisy.** Two mobile runs fifteen minutes
+apart, against the same unchanged deployment, differed by 1.1s on Speed Index — most of a second on
+the metric that has moved every time anything on this site changed. Both scored 100.
+
+That is the operational fact worth carrying: **one run is not a measurement.** Before concluding a
+change regressed something, run it again. Before concluding a change fixed something, run it again.
+A difference smaller than the spread above is noise, and the 2.8s Speed Index regression that the
+paper grain caused was only trustworthy because it was several times larger than this.
+
+**These are not comparable to the PageSpeed numbers recorded before them.** `pnpm lighthouse` runs
+from the dev container over its own network to Vercel; PageSpeed runs from Google's infrastructure.
+The 2026-09-06 mobile run reported a 0.8s First Contentful Paint against 1.2s here, and that gap is
+the measurement origin, not a regression. Compare a run to other runs from the same place.
 
 The four scores above cover everything shipped on 2026-09-06 and 2026-09-07: the composition and
 craft batch, the Open Graph cards, the styled feed, the 404 and the index numerals. So the budget
@@ -63,22 +77,32 @@ These bind at every width, not only the one the layout was composed for.
 
 ## How to measure
 
-Lighthouse needs Chrome, which the dev container does not have, so this cannot run from an agent
-session. It is a step André takes.
+```bash
+pnpm lighthouse                          # production, mobile — the default
+pnpm lighthouse --desktop                # production, desktop
+pnpm lighthouse http://localhost:4380/   # a local `pnpm preview`, as a pre-flight
+```
+
+It prints the four scores, the five metrics and every audit that scored below 1, writes a JSON and
+HTML report into `.lighthouse/` (gitignored), and exits non-zero if any category is under 100 — so it
+is usable as a gate and not only as a report.
+
+Production is the default deliberately. Throttling, compression and caching all differ on a local
+preview, and the number that matters is the one a reader gets; a local run is a pre-flight, not the
+verdict.
+
+**This did not used to be possible.** Until 2026-09-08 the dev container had no browser, so every
+check was handed to André and pasted back as a screenshot — and a design pass ran for two days
+measuring nothing while a heading rendered smaller than its own body text. `.devcontainer/post-create.sh`
+now installs a pinned Chromium on container creation. If it is ever missing, `pnpm lighthouse` says
+so and gives the one command that fixes it.
+
+PageSpeed Insights remains useful as a second opinion from outside this network, and is the only
+place the Agentic Browsing category appears:
 
 ```
 https://pagespeed.web.dev/analysis?url=https://andredreyer.com
 ```
-
-Or with Chrome locally:
-
-```bash
-npx lighthouse https://andredreyer.com --output=json --output=html \
-  --output-path=/workspace/tmp/lh-$(date +%Y%m%d-%H%M) --view
-```
-
-Measure the deployed site, not a local preview: throttling, compression and caching all differ, and
-the number that matters is the one a reader gets.
 
 ## Process
 

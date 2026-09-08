@@ -25,6 +25,19 @@ mkdir -p "${HOME}/.local/bin"
 corepack enable --install-directory "${HOME}/.local/bin" pnpm >/dev/null 2>&1 \
     || echo "post-create: corepack could not install the pnpm shim; run 'corepack enable' by hand"
 
+# Chromium, for Lighthouse and any browser-based check.
+#
+# Without it the performance budget in docs/PERFORMANCE.md cannot be verified
+# from inside the container at all — it has to be run by hand and pasted back,
+# which is how a design pass once went two days measuring nothing. Playwright's
+# build is pinned and container-friendly; --with-deps pulls the system
+# libraries, which is why this needs the passwordless sudo the image grants.
+if [ ! -d "${HOME}/.cache/ms-playwright" ]; then
+    echo "post-create: installing Chromium for Lighthouse (~150MB, once)"
+    pnpm dlx playwright install --with-deps chromium \
+        || echo "post-create: Chromium install failed; 'pnpm lighthouse' will not run until it succeeds"
+fi
+
 # Persist bash history to the /commandhistory volume so it survives rebuilds.
 # `history -a` flushes after every command rather than only on clean exit.
 if [ -d /commandhistory ] && ! grep -q 'commandhistory/.bash_history' "${HOME}/.bashrc" 2>/dev/null; then

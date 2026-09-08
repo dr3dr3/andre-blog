@@ -15,7 +15,8 @@
         "astro": "astro",
         "publish-post": "node scripts/publish-post.mjs",
         "check:og": "node scripts/check-og.mjs",
-        "check:content": "node scripts/check-content.mjs"
+        "check:content": "node scripts/check-content.mjs",
+        "lighthouse": "node scripts/lighthouse.mjs"
     },
     "dependencies": {
         "@astrojs/mdx": "^7.0.7",
@@ -26,6 +27,8 @@
     "devDependencies": {
         "@astrojs/check": "^0.9.10",
         "@resvg/resvg-js": "^2.6.2",
+        "chrome-launcher": "^1.2.1",
+        "lighthouse": "^13.4.1",
         "typescript": "^6.0.3",
         "wawoff2": "^2.0.1"
     }
