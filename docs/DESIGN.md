@@ -160,19 +160,42 @@ Measured against the relevant ground. `--rule` and `--wash` are surfaces, not te
 | Post title | JetBrains Mono 500 | 26px | 34px | tracking `-0.025em` |
 | Index title | JetBrains Mono 500 | 20px | 28px | tracking `-0.025em` |
 | Body | Newsreader (variable) | 17px, 18px ≥ 40rem | 21px | line-height 1.7, optical sizing auto |
+| Section heading | JetBrains Mono 500 | 20px, 21px ≥ 40rem | 25px | `.prose h2`, tracking `-0.025em` |
+| Sub-heading | JetBrains Mono 500 | 17px, 18px ≥ 40rem | 21px | `.prose h3`, `--muted` |
+| Artefact | JetBrains Mono | 14px, 15px ≥ 40rem | 18px | the evidence blocks |
 | Metric value | JetBrains Mono 500 | 16px | 18px | the four footer numbers, tracking `-0.02em` |
 | Utility | JetBrains Mono | 11.5px | 12.5px | metadata, dates, tags, footer |
+
+The middle three were absent from this table until 2026-09-08, and that absence was the bug. Being
+unlisted, they were never tokenised: `.prose h2` sat at a hard `1.0625rem`, `.prose h3` at
+`0.9375rem` and `.artefact pre` at `0.8125rem`, none of them stepping with the viewport. On the
+display the whole layout was composed for, a **section heading rendered at 17px against 21px body** —
+smaller than the paragraph it headed, which is not a hierarchy, and left the section numerals in the
+margin decorating a heading a reader could not find while skimming. The artefact — the site's
+evidence, and the thing `perks` in [READERS.md](READERS.md) comes for — rendered at 13px beside 21px
+prose.
+
+**The floor is h2 ≥ 1.15× body at every step.** `h3` sits at body size and reads as a heading on the
+face change alone, which is the same argument the titles already make. Anything set in prose belongs
+in this table; a role that is not listed here is a role that will silently stop scaling.
 
 The scale steps twice, at 40rem and at 90rem, and every step is set as a token rather than on
 `body`, so a rule that reads `--fs-body` gets the value actually rendering. The second step exists
 because 18px in a 62ch column reads as a stamp on a large display — a real complaint, from a 4K
 monitor at 100% zoom.
 
-It moves the measure at the same time. `ch` is the width of a zero, and Newsreader's zero is wider
-than its average lowercase glyph, so a 62ch column wraps prose at 89 characters — measured off the
-rendered index — where a line wants 45 to 75. Raising the type alone would have widened the column
-and left the line just as long, so the measure drops to 56ch in the same step: the column still
-grows, and the line comes back to about 80 characters.
+**The measure steps at 40rem, not at 90rem with the composition.** `ch` is the width of a zero, and
+Newsreader's zero is wider than its average lowercase glyph, so a 62ch column wraps prose at 89
+characters — measured off the rendered index — where a line wants 45 to 75. `--measure` drops to
+54ch, about 77 characters, and holds there at every width above it: the line length is a reading
+decision and does not change because the margin grew.
+
+It was not always split. Until 2026-09-08 the correction shipped only at `90rem`, bundled with the
+numerals and the weighted column, so every 1280- and 1366-wide laptop, every unmaximised window and
+every 200% zoom session got the line this document already called a defect. Worse, `rem` media
+queries resolve against the reader's own base font, so the breakpoint *retreated* for exactly the
+low-vision readers who needed the short line most. Readability and ornament do not belong on one
+breakpoint, and bundling them was implementation convenience dressed as a design decision.
 
 The column is not widened beyond that, and the horizontal space left over is not a defect. A prose
 column that fills a 2500px viewport is unreadable. The answer to an empty margin is structure, not

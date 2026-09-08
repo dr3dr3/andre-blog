@@ -418,11 +418,11 @@ h1 {
 }
 
 .prose h2 {
-    font-size: 1.0625rem;
+    font-size: var(--fs-h2);
 }
 
 .prose h3 {
-    font-size: 0.9375rem;
+    font-size: var(--fs-h3);
     color: var(--muted);
 }
 
@@ -693,7 +693,7 @@ h1 {
     padding: 0.875rem 1rem;
     overflow-x: auto;
     font-family: var(--mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-artefact);
     line-height: 1.55;
     tab-size: 4;
 }
