@@ -19,10 +19,11 @@ Vercel settings by hand — those are configured outside this repo, see [docs/IN
 You commit, merge and push, including to `main`. A push to `main` deploys, so the last thing you do
 before pushing is run `pnpm build`, `pnpm check`, `pnpm check:og` and `pnpm check:content` — do not
 push a red build, and never push scaffolding. The site holds **100
-in all four Lighthouse categories** and a change may not drop any of them; Lighthouse needs Chrome
-and cannot run from a session, so anything touching paint, bytes on the critical path or the
-document head gets flagged for André to measure rather than pushed on the assumption it is free.
-See [docs/PERFORMANCE.md](docs/PERFORMANCE.md). Branch, then merge
+in all four Lighthouse categories** and a change may not drop any of them. The container carries a
+browser now, so this is yours to check rather than André's: run `pnpm lighthouse` after the deploy
+lands whenever a change touches paint, bytes on the critical path or the document head. The score is
+the floor — [docs/PERFORMANCE.md](docs/PERFORMANCE.md) also carries reading conditions that a green
+score will not catch. Branch, then merge
 back with `--no-ff`; do not commit directly on `main`. Never force-push and never rewrite published
 history. `draft: false` remains the one thing you do not decide: a post going public is André's
 call, and deploying is not the same as publishing.
@@ -73,5 +74,5 @@ rounds maximum, then it goes to André regardless of unresolved objections. Brai
 
 ## Commands
 
-`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check` · `pnpm check:og` and `pnpm check:content` (both after a build — the social cards, and that no drafting scaffolding reaches a reader). `astro dev` does not work when the repo
+`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check` · `pnpm check:og` and `pnpm check:content` (both after a build — the social cards, and that no drafting scaffolding reaches a reader) · `pnpm lighthouse` (the deployed site, all four categories, exits non-zero under 100). `astro dev` does not work when the repo
 sits on a Windows drive — see "Local development" in the [README](README.md).

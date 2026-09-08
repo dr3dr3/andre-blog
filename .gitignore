@@ -54,3 +54,4 @@ drafts/*
 # André's personal AI setup (dotfiles for AI), cloned here for reference only.
 # It has its own repo: https://github.com/dr3dr3/dotai
 dotai/
+.lighthouse/
