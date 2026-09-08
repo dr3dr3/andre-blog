@@ -698,11 +698,25 @@ h1 {
     margin-top: 1.5rem;
 }
 
+/* Artefacts wrap. They do not scroll sideways.
+ *
+ * An artefact is evidence, and evidence a reader has to drag horizontally to
+ * finish a sentence is evidence they will not read. The longest line in the
+ * published archive is 103 characters against roughly 55 that fit, so half of
+ * every long line was off-screen — and raising --fs-artefact from 13px to 18px
+ * to stop the evidence being the smallest text on the page made that worse
+ * before it made it better.
+ *
+ * The print stylesheet had already reached this conclusion and set pre-wrap;
+ * the screen simply never did. `overflow-x` stays as a safety net for the one
+ * thing wrapping cannot help — an unbreakable token wider than the column. */
 .artefact pre {
     background: var(--wash);
     border-radius: var(--radius);
     padding: 0.875rem 1rem;
     overflow-x: auto;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
     font-family: var(--mono);
     font-size: var(--fs-artefact);
     line-height: 1.55;
@@ -891,8 +905,7 @@ h1 {
     }
 
     .artefact pre {
-        white-space: pre-wrap;
-        word-break: break-word;
+        /* wrapping is set on the base rule now */
         font-size: 8.5pt;
     }
 
