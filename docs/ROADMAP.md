@@ -79,8 +79,12 @@ embed. A route linked from the header, and nothing else.
 2. **A named reader and a one-line purpose**, the way [ARCHETYPES.md](ARCHETYPES.md) defines the
    four shapes. READERS.md's own test applies: a format with no class of reader is a message, not a
    format.
-3. **The design pass.** An image grid is the largest visual decision on this site. Building it while
-   [DESIGN.md](DESIGN.md) is a stub makes that decision by accident.
+3. ~~**The design pass.**~~ **Satisfied, 2026-09-07.** An image grid is the largest visual decision
+   on this site, and building it against a stub would have made that decision by accident.
+   [DESIGN.md](DESIGN.md) is now a specification, so this no longer blocks. Note what it actually
+   says before designing a grid: rule 4, that the answer to empty space is structure rather than
+   filling it, and rule 5, that nothing goes behind the text. A grid of images is the first thing
+   on this site that would test both.
 4. **Where the images come from, decided in writing.** Photographs of physical things and generated
    diagrams are fine. Work screenshots are not, and the difference matters more here than in posts.
    A scrap is casual by design, which is the same as saying it skips the drafter, the critic and the
@@ -145,7 +149,10 @@ Listed because they come up, and because a written "no" saves the argument next 
 - **Change failure rate and MTTR in the footer.** They need deployment outcomes from the Vercel API,
   which the static build does not have. They render as em dashes and the labels stay, because the
   gap is honest. Trigger: a reason to run something at build time that can hold a Vercel token.
-- **A real `docs/DESIGN.md`.** The current one is a stub recording the tokens. Trigger: the design
-  pass.
+- ~~**A real `docs/DESIGN.md`.**~~ **Done, 2026-09-07.** The design pass happened and
+  [DESIGN.md](DESIGN.md) is now the specification rather than a token manifest: six governing rules
+  and their consequences, covering colour, type, layout, detail, and everything a reader meets that
+  is not an article. Kept in this list, struck through, because the reasoning for deferring it was
+  the useful part and a deleted entry teaches nothing.
 - **Moving the repository off the Windows drive.** The dev server does not work over the v9fs bind
   mount — see "Local development" in the README. Trigger: a clean, committed tree.

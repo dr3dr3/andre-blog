@@ -1,13 +1,48 @@
 # Design
 
-**Status: stub.** This file records the tokens the site was built with and nothing more. A
-dedicated design pass will replace it with the real document — rationale, rules for when each token
-applies, and the decisions behind the type scale. Until that happens, treat this as a manifest, not
-a specification.
+**This is the specification.** It was a stub until the design pass of 2026-09-05 to 07; it is now the
+document [ROADMAP.md](ROADMAP.md) was waiting for, and that entry is closed. Where this file and the
+stylesheet disagree, this file is wrong and should be corrected — but the disagreement is a bug
+either way.
 
 The implementation lives in [`src/styles/tokens.css`](../src/styles/tokens.css) and
 [`src/styles/global.css`](../src/styles/global.css). `tokens.css` is the only file allowed to
-contain a literal colour.
+contain a literal colour, with one declared exception:
+[`public/rss.xsl`](../public/rss.xsl), which the browser renders outside the site's stylesheet and
+which therefore carries a copy.
+
+## The rules
+
+Six, and the rest of this document is their consequences. Anything proposed for this site is
+measured against them first.
+
+1. **Colour has exactly one job: labelling `outcome.status`.** Nothing else on the site takes a hue.
+   The two exceptions are declared and narrow — `--info` also carries interaction, because a link,
+   a focus ring and a text selection are the interface answering the reader rather than a verdict;
+   and `--texture` was a surface, not a hue, which is why it could exist at all.
+2. **Colour never carries meaning alone.** Every status hue tints a word that already says the same
+   thing. A signal that exists only as a hue is not allowed.
+3. **Tokens are named for the job, not the hue,** so a value can be re-picked without the name
+   becoming a lie. `--ok` may stop being green; it may not stop meaning "this worked".
+4. **The answer to an empty margin is structure, not a longer line.** The measure is capped and
+   stays capped. Space is composed — weighted, given a numeral spine — not filled.
+5. **Nothing is added behind the text.** Sixteen decorative grounds were drawn and rejected across
+   one session, and the last of them was measured shipping and pulled. Personality here comes from
+   composition and craft: type, hairlines, the wordmark, the margin, what happens at the edges.
+6. **100 in all four Lighthouse categories, and a change that touches paint gets measured, not
+   assumed.** See [PERFORMANCE.md](PERFORMANCE.md). This is the constraint that decides where
+   character can live, and it is why the print stylesheet, the social cards, the feed and the 404
+   carry as much of it as the article page does.
+
+## What is where
+
+| | |
+| --- | --- |
+| **Colour** | the two palettes, what a hue is allowed to mean, how the tone scale moved and why, measured contrast |
+| **Type** | the scale and its two steps, the optical size axis, the label register, the wordmark |
+| **Layout** | the measure, the weighted column, the hairline grammar |
+| **Detail** | selection, the flourishes taken and the ones refused |
+| **Beyond the page** | print, social cards, the feed, the 404 — everything a reader meets that is not an article |
 
 ## Colour — light
 
@@ -86,6 +121,37 @@ the absence of a value stepping back from four values in full contrast. Three of
 em dashes until the site has three posts, and a strip that shouted its own missing numbers would be
 worse than the run-on line it replaced.
 
+## The tone scale, and why it moved
+
+As originally specified, `--faint` was `#9A9E98`, measuring **2.49:1** on `--paper` — well below the
+WCAG AA threshold of 4.5:1, which applies because `--faint` is used at 11.5px, under the large-text
+exemption. Lighthouse flagged it on the footer, the index metadata and both outcome elements.
+
+The awkwardness recorded here previously was real: any value clearing AA on this ground lands within
+a hair of the original `--muted` (`#6B6F6A`, 4.68:1). Fixing `--faint` alone would have collapsed
+two tiers into one.
+
+Resolved on 2026-08-09 by moving both rather than one. `--faint` took the original `--muted` value,
+and `--muted` moved a step further from the ground. Three distinct levels survive, both palettes
+clear AA, and summaries and blockquotes gained readability as a side effect (4.68:1 → 7.40:1).
+`--ink` and `--paper` are untouched from the specified palette, as are the two hues it named:
+they are now called `--ok` and `--warn`, and their values did not move.
+
+## Contrast reference
+
+Measured against the relevant ground. `--rule` and `--wash` are surfaces, not text, so the
+4.5:1 threshold does not apply to them.
+
+| Token | Light on `--paper` | Dark on `--paper` |
+| --- | --- | --- |
+| `--ink` | 16.13:1 | 14.07:1 |
+| `--muted` | 7.40:1 | 8.83:1 |
+| `--faint` | 4.68:1 | 5.88:1 |
+| `--ok` | 6.86:1 | 7.42:1 |
+| `--info` | 7.18:1 | 7.58:1 |
+| `--warn` | 5.32:1 | 6.12:1 |
+| `--bad` | 6.80:1 | 7.21:1 |
+
 ## Type
 
 | Role | Face | Size | ≥ 90rem | Notes |
@@ -117,6 +183,38 @@ Titles set in the mono face is deliberate and central to the identity, not a pla
 Both faces are self-hosted from [`public/fonts`](../public/fonts) as `latin` and `latin-ext`
 variable subsets with `font-display: swap`. Nothing is requested from a third-party CDN at runtime.
 Both are licensed under the SIL Open Font License; the licence texts sit next to the font files.
+
+## Optical size, driven
+
+Newsreader carries an optical size axis of 6–72. The site set `font-optical-sizing: auto`, which only
+lets the axis follow font-size. The index summary and the masthead line now set `opsz 60` explicitly,
+which gives them a finer display cut at the *same* size as the body text beneath them — a second
+texture out of a file already downloaded, for no bytes.
+
+## The label register
+
+Two places set utility type in caps with `0.06`–`0.08em` of tracking: the kicker above an index
+entry (date · outcome), and the labels in the footer's metrics strip. Nothing else on the site is
+uppercase, and the register means one thing — *this names the thing under it*. The words are
+lowercase in the markup and capitalised in CSS, so `deploy freq` still reads as `deploy freq` in the
+source and in [METRICS.md](METRICS.md).
+
+The index kicker moved above the title rather than below the summary as part of this. An entry then
+reads label, title, summary — three sizes descending — instead of two body-sized blocks with a
+footnote. The kicker carries a hairline from the end of the label to the edge of the measure, which
+is what makes an index of one entry read as composed rather than sparse.
+
+Numbered artefact captions (`ARTEFACT 1 · …`) are the third use of the register, and the section
+numerals below are the fourth.
+
+## The wordmark
+
+`André` is set at 700, `Dreyer` at 500. Both faces are loaded variable across 400–700 and the site
+used exactly one weight of that range, so the axis was already paid for and sitting idle. The given
+name takes the weight because the site is a person writing, not a masthead of record.
+
+Applied in both header forms, so the compact header on a post page and the masthead on the home page
+are the same mark at two sizes.
 
 ## Layout
 
@@ -164,21 +262,33 @@ them. That reads as one stray rule, not two boundaries. The kicker's hairline is
 survives: it is the thing making a one-entry index look composed, where the header's was only
 underlining a block the masthead's own size already sets apart.
 
-## The label register
+## The hairline grammar
 
-Two places set utility type in caps with `0.06`–`0.08em` of tracking: the kicker above an index
-entry (date · outcome), and the labels in the footer's metrics strip. Nothing else on the site is
-uppercase, and the register means one thing — *this names the thing under it*. The words are
-lowercase in the markup and capitalised in CSS, so `deploy freq` still reads as `deploy freq` in the
-source and in [METRICS.md](METRICS.md).
+Hairlines are the only decoration on the site, and for a long time they were all the same object: 1px
+of `--rule`, full width, everywhere. That made the page's structure illegible — a boundary between
+the site's chrome and its content looked identical to a separator between two list items. Three
+tiers now:
 
-The index kicker moved above the title rather than below the summary as part of this. An entry then
-reads label, title, summary — three sizes descending — instead of two body-sized blocks with a
-footnote. The kicker carries a hairline from the end of the label to the edge of the measure, which
-is what makes an index of one entry read as composed rather than sparse.
+| Tier | Form | Where |
+| --- | --- | --- |
+| **Region boundary** | 1.5px `--rule` | Under the compact header, over the footer. Content ends, chrome begins. |
+| **Content rule** | 1px `--rule` | Everything else — artefact borders, blockquote edges. |
+| **Runs out** | 1px, `--rule` to transparent | The index kicker, after the date and outcome. |
 
-Numbered artefact captions (`ARTEFACT 1 · …`) are the third use of the register, and the section
-numerals below are the fourth.
+The third is the one that carries meaning rather than weight. A kicker *names* the entry beneath it;
+it does not enclose it, and a rule that ends square implies an edge that is not there. Running it out
+says the label is trailing off into the entry, which is what it is doing.
+
+The masthead carries no rule at all — see Layout above.
+
+## Selection
+
+Selecting text is the one interaction a reading site actually gets, and it was answered in the
+browser's default blue — the only colour on the site nobody chose. It is now `--info` on `--paper`.
+
+`--info` rather than `--ok`: this is the interface responding to the reader, which is the job `--info`
+already holds on links and the focus ring. It is not a status, and the rule that colour labels
+`outcome.status` and nothing else still stands.
 
 ## Four flourishes, and the ones not taken
 
@@ -237,50 +347,6 @@ Four more were drawn and rejected, recorded so they are not re-proposed:
   reviving it must **pre-rasterise the noise rather than generate it at paint time**, and must carry
   a Lighthouse number before and after. The cheaper half-step, untested: keep the 240 × 240 grain
   and drop the mottle, which was 25× the pixel count and did most of the damage.
-
-## The hairline grammar
-
-Hairlines are the only decoration on the site, and for a long time they were all the same object: 1px
-of `--rule`, full width, everywhere. That made the page's structure illegible — a boundary between
-the site's chrome and its content looked identical to a separator between two list items. Three
-tiers now:
-
-| Tier | Form | Where |
-| --- | --- | --- |
-| **Region boundary** | 1.5px `--rule` | Under the compact header, over the footer. Content ends, chrome begins. |
-| **Content rule** | 1px `--rule` | Everything else — artefact borders, blockquote edges. |
-| **Runs out** | 1px, `--rule` to transparent | The index kicker, after the date and outcome. |
-
-The third is the one that carries meaning rather than weight. A kicker *names* the entry beneath it;
-it does not enclose it, and a rule that ends square implies an edge that is not there. Running it out
-says the label is trailing off into the entry, which is what it is doing.
-
-The masthead carries no rule at all — see Layout above.
-
-## The wordmark
-
-`André` is set at 700, `Dreyer` at 500. Both faces are loaded variable across 400–700 and the site
-used exactly one weight of that range, so the axis was already paid for and sitting idle. The given
-name takes the weight because the site is a person writing, not a masthead of record.
-
-Applied in both header forms, so the compact header on a post page and the masthead on the home page
-are the same mark at two sizes.
-
-## Optical size, driven
-
-Newsreader carries an optical size axis of 6–72. The site set `font-optical-sizing: auto`, which only
-lets the axis follow font-size. The index summary and the masthead line now set `opsz 60` explicitly,
-which gives them a finer display cut at the *same* size as the body text beneath them — a second
-texture out of a file already downloaded, for no bytes.
-
-## Selection
-
-Selecting text is the one interaction a reading site actually gets, and it was answered in the
-browser's default blue — the only colour on the site nobody chose. It is now `--info` on `--paper`.
-
-`--info` rather than `--ok`: this is the interface responding to the reader, which is the job `--info`
-already holds on links and the focus ring. It is not a status, and the rule that colour labels
-`outcome.status` and nothing else still stands.
 
 ## Print
 
@@ -359,34 +425,3 @@ thing a 404 can do here, and the archive is short enough that listing all of it 
 than a consolation.
 
 Neither is scored: an XSL result is not a page Lighthouse loads, and a 404 is not the audited route.
-
-## The tone scale, and why it moved
-
-As originally specified, `--faint` was `#9A9E98`, measuring **2.49:1** on `--paper` — well below the
-WCAG AA threshold of 4.5:1, which applies because `--faint` is used at 11.5px, under the large-text
-exemption. Lighthouse flagged it on the footer, the index metadata and both outcome elements.
-
-The awkwardness recorded here previously was real: any value clearing AA on this ground lands within
-a hair of the original `--muted` (`#6B6F6A`, 4.68:1). Fixing `--faint` alone would have collapsed
-two tiers into one.
-
-Resolved on 2026-08-09 by moving both rather than one. `--faint` took the original `--muted` value,
-and `--muted` moved a step further from the ground. Three distinct levels survive, both palettes
-clear AA, and summaries and blockquotes gained readability as a side effect (4.68:1 → 7.40:1).
-`--ink` and `--paper` are untouched from the specified palette, as are the two hues it named:
-they are now called `--ok` and `--warn`, and their values did not move.
-
-## Contrast reference
-
-Measured against the relevant ground. `--rule` and `--wash` are surfaces, not text, so the
-4.5:1 threshold does not apply to them.
-
-| Token | Light on `--paper` | Dark on `--paper` |
-| --- | --- | --- |
-| `--ink` | 16.13:1 | 14.07:1 |
-| `--muted` | 7.40:1 | 8.83:1 |
-| `--faint` | 4.68:1 | 5.88:1 |
-| `--ok` | 6.86:1 | 7.42:1 |
-| `--info` | 7.18:1 | 7.58:1 |
-| `--warn` | 5.32:1 | 6.12:1 |
-| `--bad` | 6.80:1 | 7.21:1 |
