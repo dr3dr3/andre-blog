@@ -1,22 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostEntry from '../components/PostEntry.astro';
-import { getPosts } from '../lib/posts';
+import { getArchiveNumbers, getPosts } from '../lib/posts';
 
 // Reverse-chronological, no pagination. Revisit at 30 posts.
 const posts = await getPosts();
+const numbers = await getArchiveNumbers();
 ---
 
 <BaseLayout
-    title="André Dreyer"
+    title="André Dreyer — platform engineering, AI agents and the systems around them"
     description="Notes on platform engineering, AI agents and the systems around them."
     masthead
 >
     <ul class="post-index">
         {
-            /* Newest first, but numbered oldest first, so the number is the
-               post's place in the archive rather than its place in this list. */
-            posts.map((post, i) => <PostEntry post={post} number={posts.length - i} />)
+            /* Newest first, numbered oldest first: the number is the post's
+               place in the archive, not its place in this list. */
+            posts.map((post) => <PostEntry post={post} number={numbers.get(post.id)!} />)
         }
     </ul>
 </BaseLayout>

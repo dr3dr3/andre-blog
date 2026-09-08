@@ -334,21 +334,38 @@ main {
     margin-top: 2.75rem;
 }
 
-.post-index > li > a {
+.post-index > li > .index-title {
     margin-top: 0.35rem;
     font-family: var(--mono);
     font-weight: 500;
     font-size: var(--fs-index-title);
     letter-spacing: -0.025em;
     line-height: 1.35;
-    color: var(--ink);
-    text-decoration: none;
-    display: inline-block;
 }
 
-.post-index > li > a:hover {
+/* Block, and padded past the line box. A single-line title at 20px/1.35 is
+ * about 27px tall — under the 44px touch floor, on the one control the entry
+ * exists to offer, while the unclickable summary beneath it looked larger and
+ * more tappable. The negative margin cancels the padding, so the hit area
+ * grows and nothing moves. */
+.post-index > li > .index-title > a {
+    display: block;
+    padding-block: 0.55rem;
+    margin-block: -0.55rem;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.post-index > li > .index-title > a:hover {
     text-decoration: underline;
     text-decoration-color: var(--info);
+}
+
+/* The tag page said what it was only in its meta description, which is not a
+ * place a reader looks. */
+.tag-intro {
+    margin-top: 0.5rem;
+    color: var(--muted);
 }
 
 /* Newsreader carries an optical size axis of 6-72 and the site only ever let
@@ -972,4 +989,14 @@ h1 {
         letter-spacing: 0.06em;
         color: var(--faint);
     }
+}
+
+/* The current page in the nav. Marked in the markup with aria-current so it is
+ * announced, and shown here so it is also visible — a state a screen reader
+ * gets and a sighted reader does not is half a fix. */
+.site-header nav a[aria-current='page'] {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 0.25em;
 }

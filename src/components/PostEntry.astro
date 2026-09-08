@@ -34,6 +34,11 @@ const { post, number } = Astro.props;
             />
         </span>
     </p>
-    <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+    {/* A heading, not a bare link. Every listing on this site used <a> inside
+        <li>, which left the home page exposing exactly one heading — the
+        masthead — so screen-reader heading navigation over the index returned
+        nothing at all. h2 is right on all three listings: the masthead, "Not
+        found" and the tag name are the h1 above them. */}
+    <h2 class="index-title"><a href={`/posts/${post.id}/`}>{post.data.title}</a></h2>
     <p class="summary">{post.data.summary}</p>
 </li>

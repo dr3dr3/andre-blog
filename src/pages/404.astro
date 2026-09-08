@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostEntry from '../components/PostEntry.astro';
-import { getPosts } from '../lib/posts';
+import { getArchiveNumbers, getPosts } from '../lib/posts';
 
 /*
  * A 404 is the one page where nobody is mid-article and nothing is interrupted,
@@ -11,6 +11,7 @@ import { getPosts } from '../lib/posts';
  * answer rather than a consolation link.
  */
 const posts = await getPosts();
+const numbers = await getArchiveNumbers();
 ---
 
 <BaseLayout title="Not found — André Dreyer" description="That page does not exist.">
@@ -26,6 +27,6 @@ const posts = await getPosts();
     </article>
 
     <ul class="post-index notfound-index">
-        {posts.map((post, i) => <PostEntry post={post} number={posts.length - i} />)}
+        {posts.map((post) => <PostEntry post={post} number={numbers.get(post.id)!} />)}
     </ul>
 </BaseLayout>

@@ -22,6 +22,19 @@ export async function getPosts(): Promise<Post[]> {
     return posts.sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
 }
 
+/**
+ * Each post's place in publication order, oldest first, keyed by id.
+ *
+ * A property of the archive rather than of whatever list is being rendered.
+ * Deriving it from a list's own index works on the home page by accident and
+ * breaks on a tag page, where a filtered list of one would number the newest
+ * post `01`. Publishing does not renumber what came before.
+ */
+export async function getArchiveNumbers(): Promise<Map<string, number>> {
+    const posts = await getPosts(); // newest first
+    return new Map(posts.map((post, i) => [post.id, posts.length - i]));
+}
+
 /** Every tag in use, deduplicated and alphabetised. */
 export async function getTags(): Promise<string[]> {
     const posts = await getPosts();
