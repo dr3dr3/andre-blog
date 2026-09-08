@@ -35,6 +35,20 @@ export async function getArchiveNumbers(): Promise<Map<string, number>> {
     return new Map(posts.map((post, i) => [post.id, posts.length - i]));
 }
 
+/**
+ * The post to read after this one: the next newer, or the next older when this
+ * is already the newest. Null only when it is the only post.
+ *
+ * The end of an article is the highest-intent moment a reading site gets, and
+ * it used to be a dead end — tags, then five rems of nothing, then the footer.
+ */
+export async function getNextToRead(id: string): Promise<Post | null> {
+    const posts = await getPosts(); // newest first
+    const i = posts.findIndex((p) => p.id === id);
+    if (i === -1 || posts.length < 2) return null;
+    return i === 0 ? posts[1] : posts[i - 1];
+}
+
 /** Every tag in use, deduplicated and alphabetised. */
 export async function getTags(): Promise<string[]> {
     const posts = await getPosts();

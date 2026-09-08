@@ -646,12 +646,6 @@ h1 {
     color: var(--ink);
 }
 
-.post-meta abbr {
-    text-decoration: underline dotted var(--faint);
-    text-underline-offset: 0.2em;
-    cursor: help;
-}
-
 .sep {
     color: var(--faint);
 }
@@ -999,4 +993,87 @@ h1 {
     text-decoration: underline;
     text-decoration-color: var(--rule);
     text-underline-offset: 0.25em;
+}
+
+/* ---------------------------------------------------------------------------
+ * Read next.
+ *
+ * The end of an article was a dead end: tags, five rems of nothing, then the
+ * footer, and no route onward but scrolling the whole post back up to the nav.
+ * That is the highest-intent moment a reading site gets and it offered nothing.
+ *
+ * One entry, rendered through PostEntry so it cannot drift from the index and
+ * so it carries the same archive number the reader already saw there.
+ * ------------------------------------------------------------------------ */
+
+.read-next {
+    max-width: var(--measure);
+    margin: 4rem auto 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+}
+
+.read-next > .label {
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--faint);
+}
+
+.read-next .post-index {
+    margin-top: 1.25rem;
+}
+
+/* The version, rendered rather than hidden in a tooltip. --faint keeps it
+ * secondary to the name without making it a footnote. */
+.stack-version {
+    color: var(--faint);
+}
+
+.post-meta .stack-version::before {
+    content: ' ';
+}
+
+/* The tags were two bare links with no label, announced as "writing, link.
+ * tooling, link." with no indication of what they were or where they went. */
+.post-tags-label {
+    color: var(--faint);
+    margin-right: 0.5rem;
+}
+
+/* The outcome glossary on the colophon. The site's only colour system was
+ * explained on no page — a reader met a private taxonomy carrying the only hue
+ * on the screen and had nowhere to resolve it. */
+.outcomes {
+    margin-top: 1.25rem;
+}
+
+.outcomes dt {
+    margin-top: 1rem;
+    font-family: var(--mono);
+    font-size: var(--fs-utility);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.outcomes dd {
+    margin-top: 0.25rem;
+    color: var(--muted);
+}
+
+/* A metadata label that leads somewhere. Underlined in --rule rather than
+ * --info: it is a definition, not a destination, and the metadata block should
+ * not sprout a second link colour beside the values it labels. */
+.meta-help {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 0.2em;
+}
+
+.meta-help:hover,
+.meta-help:focus-visible {
+    text-decoration-color: var(--info);
 }

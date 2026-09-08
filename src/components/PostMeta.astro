@@ -29,20 +29,24 @@ const { data, minutes } = Astro.props;
                     {data.stack.map((item, i) => (
                         <>
                             {i > 0 && <span class="sep"> · </span>}
-                            {item.version ? (
-                                <abbr title={`${item.name} ${item.version}`} tabindex="0">
-                                    {item.name}
-                                </abbr>
-                            ) : (
-                                <span>{item.name}</span>
-                            )}
+                            {/* The version is rendered, not hidden in a tooltip.
+                                `abbr[title]` is hover-only: it does not exist on a
+                                touch device, and its announcement is inconsistent
+                                across screen readers. The version is the evidence
+                                a post rests on, and READERS.md says most readers
+                                arrive by phone — so it was invisible to almost
+                                everyone it was for. */}
+                            <span>{item.name}</span>
+                            {item.version && <span class="stack-version">{item.version}</span>}
                         </>
                     ))}
                 </dd>
             </>
         )
     }
-    <dt>outcome</dt>
+    {/* The label links to the glossary. The taxonomy carries the site's only
+        colour and was explained on no page a reader could reach. */}
+    <dt><a class="meta-help" href="/colophon#what-the-outcomes-mean">outcome</a></dt>
     <dd>
         <Outcome status={data.outcome.status} was={data.outcome.was} changed={data.outcome.changed} />
     </dd>

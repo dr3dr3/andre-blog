@@ -212,3 +212,18 @@ only on hover announces itself to nobody on a touchscreen.
 - **Window asymmetry.** Metric 1 uses a trailing 90 days; metrics 2–4 use every published post.
   Cadence is a question about now; the corpus is a question about the whole body of work. Worth
   revisiting when the archive is large enough that all-time figures stop moving.
+
+## The em dash was challenged, and stands
+
+An `/impeccable critique` on 2026-09-08 raised the footer as an end-of-page problem: three of the
+four values are em dashes, they are the last thing on every page, and the strip reads as an empty
+ledger. The proposed fix was to render only the metrics that resolve.
+
+**Declined.** It contradicts rule 2 above, and rule 2 is right. An em dash discloses that a metric
+exists and is not yet available; hiding the row conceals that it exists at all. A reader who cannot
+see `draft→live` cannot know the site measures it, and a footer that quietly grows new numbers as
+they become computable is less honest than one that shows what it is waiting for.
+
+What the critique got right is that this is the last thing a reader sees. That is an argument about
+what belongs at the end of a post, and it was answered by putting a **read next** entry above the
+footer rather than by editing the strip.
