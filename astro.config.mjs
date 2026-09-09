@@ -23,8 +23,10 @@ export default defineConfig({
     markdown: { syntaxHighlight: false },
 
     /*
-     * Fonts are declared here rather than as hand-written @font-face rules so
-     * that Astro generates a metric-matched fallback for each face.
+     * Fonts are declared here rather than as hand-written @font-face rules, for
+     * a metric-matched fallback per face and for `display: optional`. Both are
+     * answers to the same defect, and the second is the one that works
+     * everywhere.
      *
      * The hand-written rules used font-display: swap against an unadjusted
      * Georgia and ui-monospace. When the real faces landed, a post summary on
@@ -34,6 +36,29 @@ export default defineConfig({
      * at 99. `optimizedFallbacks` derives size-adjust and the ascent, descent
      * and line-gap overrides from the actual font files, so the fallback
      * occupies the same space as the real face and the swap moves nothing.
+     *
+     * That alone did not fix the score, and the reason is worth keeping. Astro
+     * builds the adjusted face against `local("Times New Roman")` and
+     * `local("Courier New")` — it ships metrics for seven families and none of
+     * them is a Linux or Android font. The machine Lighthouse runs on has
+     * neither, nor Georgia; it has Liberation and Free. So the adjusted face
+     * resolves to nothing there, the adjustment never applies, and production
+     * still measured 0.068 on three runs after the change. The fallback is kept
+     * because it does work for readers on macOS and Windows, which is most of
+     * them, but it cannot be the whole answer.
+     *
+     * `display: optional` is. The browser gives each face a short block period
+     * and, if it has not arrived, uses the fallback for that page load and
+     * swaps nothing — so nothing moves, on any platform, with or without the
+     * adjusted metrics. The font still downloads and every later visit is
+     * served from cache at full fidelity.
+     *
+     * The cost is stated rather than hidden: a first visit on a connection too
+     * slow to deliver the preloaded faces inside the block period reads that
+     * page in Georgia. That is the trade — one visit in the fallback face,
+     * against every reader on every platform watching a paragraph reflow
+     * mid-sentence. A page that renders in Georgia and holds still is the
+     * better read.
      *
      * The files stay in public/fonts because two surfaces need them at a
      * stable, unhashed URL that Astro's pipeline does not provide:
@@ -60,7 +85,7 @@ export default defineConfig({
             provider: fontProviders.local(),
             fallbacks: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
             optimizedFallbacks: true,
-            display: 'swap',
+            display: 'optional',
             options: {
                 variants: [
                     {
@@ -78,7 +103,7 @@ export default defineConfig({
             provider: fontProviders.local(),
             fallbacks: ['Georgia', 'Times New Roman', 'serif'],
             optimizedFallbacks: true,
-            display: 'swap',
+            display: 'optional',
             options: {
                 variants: [
                     {
