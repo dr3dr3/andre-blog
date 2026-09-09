@@ -114,6 +114,11 @@
         --fs-h2: 1.3125rem; /* 21px — 1.17x body */
         --fs-h3: 1.125rem; /* 18px */
         --fs-artefact: 0.9375rem; /* 15px */
+        /* The index title stepped only at 90rem, so between 40rem and 90rem it
+         * sat at 20px against 18px body — 1.11x, under the same floor the prose
+         * heading has to clear. Found by pnpm check:reading, which is the whole
+         * point of it: this is the identical mistake the prose scale made. */
+        --fs-index-title: 1.375rem; /* 22px — 1.22x body */
 
         /* The measure steps here, not at 90rem with the composition.
          *

@@ -17,8 +17,9 @@ Vercel settings by hand — those are configured outside this repo, see [docs/IN
 ## Git
 
 You commit, merge and push, including to `main`. A push to `main` deploys, so the last thing you do
-before pushing is run `pnpm build`, `pnpm check`, `pnpm check:og` and `pnpm check:content` — do not
-push a red build, and never push scaffolding. The site holds **100
+before pushing is run `pnpm build`, `pnpm check`, `pnpm check:og`, `pnpm check:content` and
+`pnpm check:reading` — do not push a red build, never push scaffolding, and never push a page that
+cannot be read comfortably. The site holds **100
 in all four Lighthouse categories** and a change may not drop any of them. The container carries a
 browser now, so this is yours to check rather than André's: run `pnpm lighthouse` after the deploy
 lands whenever a change touches paint, bytes on the critical path or the document head. The score is
@@ -74,5 +75,5 @@ rounds maximum, then it goes to André regardless of unresolved objections. Brai
 
 ## Commands
 
-`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check` · `pnpm check:og` and `pnpm check:content` (both after a build — the social cards, and that no drafting scaffolding reaches a reader) · `pnpm lighthouse` (the deployed site, all four categories, exits non-zero under 100). `astro dev` does not work when the repo
+`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check` · `pnpm check:og` and `pnpm check:content` (both after a build — the social cards, and that no drafting scaffolding reaches a reader) · `pnpm check:reading` (the built site in a real browser at five viewports — measure, heading scale, evidence legibility, tap targets) · `pnpm lighthouse` (the deployed site, all four categories, exits non-zero under 100). `astro dev` does not work when the repo
 sits on a Windows drive — see "Local development" in the [README](README.md).

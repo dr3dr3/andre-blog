@@ -16,7 +16,8 @@
         "publish-post": "node scripts/publish-post.mjs",
         "check:og": "node scripts/check-og.mjs",
         "check:content": "node scripts/check-content.mjs",
-        "lighthouse": "node scripts/lighthouse.mjs"
+        "lighthouse": "node scripts/lighthouse.mjs",
+        "check:reading": "node scripts/check-reading.mjs"
     },
     "dependencies": {
         "@astrojs/mdx": "^7.0.7",
@@ -29,6 +30,7 @@
         "@resvg/resvg-js": "^2.6.2",
         "chrome-launcher": "^1.2.1",
         "lighthouse": "^13.4.1",
+        "playwright-core": "^1.63.0",
         "typescript": "^6.0.3",
         "wawoff2": "^2.0.1"
     }
