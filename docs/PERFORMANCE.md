@@ -122,6 +122,25 @@ measuring nothing while a heading rendered smaller than its own body text. `.dev
 now installs a pinned Chromium on container creation. If it is ever missing, `pnpm lighthouse` says
 so and gives the one command that fixes it.
 
+### The tools must close the browser
+
+Both measurement scripts drive a real Chromium, and on 2026-09-09 the container was found holding
+**90 orphaned Chromium roots — 360 processes and 22.8GB of resident memory**, accumulated over a
+day of measuring. Free memory was down to 2.1GB and swap to 436KB.
+
+The cause was one line. `scripts/lighthouse.mjs` called `process.exit()` *inside* a `try` whose
+`finally` did `chrome.kill()`. `process.exit()` terminates synchronously and a pending `finally`
+never runs, so the browser was orphaned on **every** invocation — the passing ones as much as the
+failing ones. Reparented to init, each one sat there holding memory.
+
+Both scripts now kill the browser from an `exit` handler and from `SIGINT`/`SIGTERM`/`SIGHUP`, and
+set `process.exitCode` rather than calling `process.exit()` while a browser is open. A Ctrl-C on a
+slow run is covered too, which the original `finally` never was.
+
+The rule this leaves: **a script that launches a browser closes it on every path out, and
+`process.exit()` is not a path that runs `finally`.** After changing either script, run it once and
+check `ps -eo args | grep -c ms-playwright` returns to zero.
+
 PageSpeed Insights remains useful as a second opinion from outside this network, and is the only
 place the Agentic Browsing category appears:
 

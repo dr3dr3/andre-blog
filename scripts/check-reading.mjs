@@ -163,6 +163,22 @@ function measure() {
 
 const { server, port } = await serve();
 const browser = await chromium.launch({ executablePath: findChrome(), args: ['--no-sandbox', '--disable-gpu'] });
+
+/*
+ * The `finally` below covers a normal run and a thrown error, but not Ctrl-C on
+ * a slow one — a signal ends the process without unwinding, and the browser is
+ * reparented to init and stays. That is how sibling script scripts/lighthouse.mjs
+ * filled this devcontainer with 90 orphaned Chromium roots; see the comment
+ * there. Nothing has to have gone wrong for the leak to happen, so the net goes
+ * in here too rather than waiting for it to.
+ */
+for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
+    process.on(signal, () => {
+        browser.close().catch(() => {});
+        server.close();
+        process.exit(130);
+    });
+}
 const base = `http://127.0.0.1:${port}`;
 // Every distinct page shape on the site. /about and /colophon are here because
 // they are the two long-prose pages that are not posts: they carry the same
