@@ -164,7 +164,18 @@ function measure() {
 const { server, port } = await serve();
 const browser = await chromium.launch({ executablePath: findChrome(), args: ['--no-sandbox', '--disable-gpu'] });
 const base = `http://127.0.0.1:${port}`;
-const PAGES = ['/', '/posts/expected-a-few-days/', '/tags/tooling/', '/404.html'];
+// Every distinct page shape on the site. /about and /colophon are here because
+// they are the two long-prose pages that are not posts: they carry the same
+// measure and heading scale, and nothing else in the gate would notice if one
+// of them stopped being readable. A route added to src/pages/ belongs here.
+const PAGES = [
+    '/',
+    '/posts/expected-a-few-days/',
+    '/about/',
+    '/colophon/',
+    '/tags/tooling/',
+    '/404.html',
+];
 
 const failures = [];
 const note = (msg) => (REPORT_ONLY ? console.log(`    · ${msg}`) : failures.push(msg));
