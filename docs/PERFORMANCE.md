@@ -13,11 +13,11 @@ Emulated Moto G Power, Slow 4G throttling, Lighthouse 13.4.1, `https://andredrey
 
 | Category | Mobile | Desktop | Captured |
 | --- | --- | --- | --- |
-| Performance | **100** | **100** | 2026-09-08 |
-| Accessibility | **100** | **100** | 2026-09-08 |
-| Best Practices | **100** | **100** | 2026-09-08 |
-| SEO | **100** | **100** | 2026-09-08 |
-| Agentic Browsing | 3/3 | — | 2026-09-07 (PageSpeed only) |
+| Performance | **100** | **100** | 2026-09-09 |
+| Accessibility | **100** | **100** | 2026-09-09 |
+| Best Practices | **100** | **100** | 2026-09-09 |
+| SEO | **100** | **100** | 2026-09-09 |
+| Agentic Browsing | 65 | — | 2026-09-09 (fails `llms-txt`; not part of the rule) |
 
 Run with `pnpm lighthouse` against production, Lighthouse 13.4.1. It covers everything shipped in the
 2026-09-08 batch: the About fix, the prose type scale, the measure step, heading semantics, read
@@ -27,11 +27,11 @@ Measured 2026-09-09, three consecutive warm runs, identical to the digit.
 
 | Metric | Mobile | Desktop |
 | --- | --- | --- |
-| First Contentful Paint | 0.8s | 0.2s |
-| Largest Contentful Paint | 1.2–1.7s | 0.3s |
+| First Contentful Paint | 0.8–0.9s | 0.2s |
+| Largest Contentful Paint | 1.1–1.5s | 0.3s |
 | Total Blocking Time | 0ms | 0ms |
-| Cumulative Layout Shift | 0.028 | 0.006 |
-| Speed Index | 1.0s | 0.4s |
+| Cumulative Layout Shift | **0** | **0** |
+| Speed Index | 1.0–2.4s | 0.4s |
 
 **Ranges, not values, because a single run from here is noisy.** Two mobile runs fifteen minutes
 apart, against the same unchanged deployment, differed by 1.1s on Speed Index — most of a second on
@@ -42,11 +42,20 @@ change regressed something, run it again. Before concluding a change fixed somet
 A difference smaller than the spread above is noise, and the 2.8s Speed Index regression that the
 paper grain caused was only trustworthy because it was several times larger than this.
 
-**Discard the first run after a deploy.** On 2026-09-09 the run taken immediately after a deploy
-landed reported Cumulative Layout Shift at 0.068 and put Performance under 100 — the gate fired. The
-next three runs, against the same unchanged deployment, each reported 0.028 and 100, identically. The
-first request after a deploy pays for a cold edge cache and does not represent what a reader gets.
-Wait, or run it twice and keep the second.
+**Discard the first run after a deploy.** The first request after a deploy pays for a cold edge
+cache and does not represent what a reader gets. Wait, or run it twice and keep the second. Speed
+Index is where this shows most.
+
+**But a re-run is not an explanation.** On 2026-09-09 a first-run Cumulative Layout Shift of 0.068
+was recorded here as a cold-cache artefact because the next three runs read 0.028. Later the same
+day 0.068 came back and stayed — four consecutive runs, identical to the digit — and it was a real
+font-swap reflow that had been present all along, small enough to score 100 until a footer number
+widened and pushed it over. The re-run was right that the number was unstable; the conclusion drawn
+from it was wrong.
+
+So: re-run to establish whether a reading is stable, then explain it. A value that repeats is a
+measurement, whatever ran before it, and Cumulative Layout Shift in particular has a culprit audit
+— `layout-shifts` names the element and the cause. Read it before attributing anything to cache.
 
 **These are not comparable to the PageSpeed numbers recorded before them.** `pnpm lighthouse` runs
 from the dev container over its own network to Vercel; PageSpeed runs from Google's infrastructure.
@@ -57,8 +66,12 @@ The four scores above cover everything shipped on 2026-09-06 and 2026-09-07: the
 craft batch, the Open Graph cards, the styled feed, the 404 and the index numerals. So the budget
 has been held across five design commits rather than merely set.
 
-**Agentic Browsing** is PageSpeed's newer category and is not part of the rule as written. It passes
-3/3 today. Recorded because it is measured, not because it is a target.
+**Agentic Browsing** is PageSpeed's newer category and is not part of the rule as written, and
+`pnpm lighthouse` checks the four named categories only. It scored 3/3 on PageSpeed on 2026-09-07;
+a local run on 2026-09-09 scored it 65, failing `llms-txt` — *"Fetch of llms.txt failed: Timed out
+fetching resource"*, this site having no `/llms.txt`. Recorded because it is measured, not because
+it is a target. Whether this site wants an `llms.txt` is undecided and sits near the rejected list
+in [CLAUDE.md](../CLAUDE.md).
 
 **The Chrome User Experience Report has no field data for this site**, and says so on the report. It
 needs real visitor traffic before it reports anything, and its absence does not affect the score —
