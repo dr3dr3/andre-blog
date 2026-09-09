@@ -226,9 +226,30 @@ a longer line.
 
 Titles set in the mono face is deliberate and central to the identity, not a placeholder.
 
-Both faces are self-hosted from [`public/fonts`](../public/fonts) as `latin` and `latin-ext`
-variable subsets with `font-display: swap`. Nothing is requested from a third-party CDN at runtime.
-Both are licensed under the SIL Open Font License; the licence texts sit next to the font files.
+Both faces are self-hosted from [`public/fonts`](../public/fonts) as variable subsets with
+`font-display: swap`. Nothing is requested from a third-party CDN at runtime. Both are licensed
+under the SIL Open Font License; the licence texts sit next to the font files.
+
+The `@font-face` rules are not hand-written. They are declared in
+[`astro.config.mjs`](../astro.config.mjs) so that Astro measures the actual font files and emits a
+**metric-matched fallback** beside each one — `size-adjust`, `ascent-override`, `descent-override`
+and `line-gap-override` derived from the real metrics, so the fallback occupies the same space as
+the face it stands in for.
+
+That is not a refinement. The hand-written rules swapped against an unadjusted Georgia and
+`ui-monospace`, and when the real faces arrived a summary on the home page gained a line and
+everything below it moved. Lighthouse measured one shift of `0.0677` on `ul.post-index > li`, cause
+*Web font loaded*, which held Cumulative Layout Shift at 0.068 and Performance at 99 on four
+consecutive runs. With matched fallbacks the same page measures 0. Rule 6 is a floor and this is
+what it looks like when it bites: the shift had been there all along, small enough to score 100,
+until a footer number widened and pushed it over.
+
+Only the `latin` subset is declared. `latin-ext` is still on disk and deliberately unused — see the
+comment in the config for the measurements behind that and the one consequence it carries.
+
+Two characters the site uses are in neither font file: `→` (U+2192), in the footer's `draft→live`
+label, and any extended-range glyph. They render in the fallback. Cosmetic, and recorded here so it
+is a known state rather than a discovery.
 
 ## Optical size, driven
 

@@ -2,6 +2,7 @@
 import SiteFooter from '../components/SiteFooter.astro';
 import Analytics from '../components/Analytics.astro';
 import '../styles/global.css';
+import { Font } from 'astro:assets';
 
 interface Props {
     /** Page title, used verbatim in <title> and og:title. */
@@ -31,20 +32,8 @@ const url = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
         <meta name="description" content={description} />
         <link rel="canonical" href={url} />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link
-            rel="preload"
-            href="/fonts/jetbrains-mono-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin
-        />
-        <link
-            rel="preload"
-            href="/fonts/newsreader-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin
-        />
+        <Font cssVariable="--font-mono" preload />
+        <Font cssVariable="--font-serif" preload />
         <link rel="alternate" type="application/rss+xml" title="André Dreyer" href="/rss.xml" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content={title} />

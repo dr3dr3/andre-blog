@@ -43,8 +43,12 @@
     --bad: #8e3b34; /* oxide — failure artefacts */
 
     /* Type */
-    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+    /* Astro emits --font-mono and --font-serif, each already carrying its
+     * metric-matched fallback ahead of the plain system stack. The literal
+     * stacks stay here as the value of last resort, for the RSS stylesheet's
+     * sake and for any context the generated variables do not reach. */
+    --mono: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+    --serif: var(--font-serif, Georgia, 'Times New Roman', serif);
 
     /* The scale steps up twice with the viewport; see the two queries at the
      * foot of this file. Every step is set here rather than on `body` so a
