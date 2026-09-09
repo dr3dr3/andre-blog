@@ -227,7 +227,7 @@ a longer line.
 Titles set in the mono face is deliberate and central to the identity, not a placeholder.
 
 Both faces are self-hosted from [`public/fonts`](../public/fonts) as variable subsets with
-`font-display: swap`. Nothing is requested from a third-party CDN at runtime. Both are licensed
+`font-display: optional`. Nothing is requested from a third-party CDN at runtime. Both are licensed
 under the SIL Open Font License; the licence texts sit next to the font files.
 
 The `@font-face` rules are not hand-written. They are declared in
@@ -240,9 +240,27 @@ That is not a refinement. The hand-written rules swapped against an unadjusted G
 `ui-monospace`, and when the real faces arrived a summary on the home page gained a line and
 everything below it moved. Lighthouse measured one shift of `0.0677` on `ul.post-index > li`, cause
 *Web font loaded*, which held Cumulative Layout Shift at 0.068 and Performance at 99 on four
-consecutive runs. With matched fallbacks the same page measures 0. Rule 6 is a floor and this is
-what it looks like when it bites: the shift had been there all along, small enough to score 100,
-until a footer number widened and pushed it over.
+consecutive runs. Rule 6 is a floor and this is what it looks like when it bites: the shift had
+been there all along, small enough to score 100, until a footer number widened and pushed it over.
+
+**The matched fallback was not enough on its own, and the reason matters.** Astro builds the
+adjusted face against `local("Times New Roman")`; it ships metrics for seven families and none is a
+Linux or Android font. The machine Lighthouse runs on has no Times New Roman, no Courier New and no
+Georgia — it has Liberation and Free — so the adjusted face resolves to nothing there and
+production still measured 0.068 on three runs after the change. It is kept because it does work for
+readers on macOS and Windows. It is not the whole answer.
+
+`font-display: optional` is. The browser uses the fallback for that page load rather than swapping
+mid-read, so nothing moves on any platform. The cost, stated rather than hidden: a first visit on a
+connection too slow to deliver the preloaded faces inside the block period reads that page in
+Georgia. Every later visit is cached and at full fidelity. One visit in the fallback face, against
+every reader on every platform watching a paragraph reflow — a page that renders in Georgia and
+holds still is the better read.
+
+A local measurement claimed this was fixed a step earlier than it was. The local server was fast
+enough that the faces arrived before first paint, so the swap never happened and Cumulative Layout
+Shift read 0 for the wrong reason. **A font-loading change is measured against production or it is
+not measured.**
 
 Only the `latin` subset is declared. `latin-ext` is still on disk and deliberately unused — see the
 comment in the config for the measurements behind that and the one consequence it carries.
