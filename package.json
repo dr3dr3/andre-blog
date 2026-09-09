@@ -17,7 +17,8 @@
         "check:og": "node scripts/check-og.mjs",
         "check:content": "node scripts/check-content.mjs",
         "lighthouse": "node scripts/lighthouse.mjs",
-        "check:reading": "node scripts/check-reading.mjs"
+        "check:reading": "node scripts/check-reading.mjs",
+        "fonts": "node scripts/subset-fonts.mjs"
     },
     "dependencies": {
         "@astrojs/mdx": "^7.0.7",
@@ -31,6 +32,7 @@
         "chrome-launcher": "^1.2.1",
         "lighthouse": "^13.4.1",
         "playwright-core": "^1.63.0",
+        "subset-font": "^2.7.0",
         "typescript": "^6.0.3",
         "wawoff2": "^2.0.1"
     }

@@ -262,8 +262,29 @@ enough that the faces arrived before first paint, so the swap never happened and
 Shift read 0 for the wrong reason. **A font-loading change is measured against production or it is
 not measured.**
 
-Only the `latin` subset is declared. `latin-ext` is still on disk and deliberately unused — see the
-comment in the config for the measurements behind that and the one consequence it carries.
+Only the `latin` subset is declared. `latin-ext` is kept as a source and deliberately unserved —
+see the comment in the config for the measurements behind that and the one consequence it carries.
+
+**The served faces are cut down from the downloads.** `src/fonts` holds the Google Fonts subsets as
+downloaded; [`scripts/subset-fonts.mjs`](../scripts/subset-fonts.mjs) writes what `public/fonts`
+serves, and `pnpm fonts` regenerates it. Reading and writing different directories is what makes it
+idempotent — it can never compound by re-reading its own output.
+
+Two axis clamps, and **no glyph is dropped**: 209 codepoints before and after, `é ü ñ · — ’ € £`
+all intact.
+
+| | | |
+| --- | --- | --- |
+| `wght` | 200–800 → 400–700 | Newsreader ships the full range; the stylesheet asks for 400, 500 and 700 and the `@font-face` has always declared `400 700`. Everything outside it was downloaded and unreachable. |
+| `opsz` | 6–72 → 11–60 | The smallest type on the site is 11.5px; the largest Newsreader is set at is the explicit `opsz 60` on the index summary and masthead line. Outside the range the axis clamps, which shifts the optical cut slightly and never breaks a glyph. JetBrains Mono has no such axis. |
+
+Newsreader 128.9KB → 84.9KB, JetBrains Mono 30.7KB → 27.2KB: **47.5KB off the critical path for
+nothing a reader can see.**
+
+Cutting unused glyphs as well would save another 38% on Newsreader and was refused. It would mean a
+name with an umlaut in a future post rendering in the fallback face, and the axis clamps already
+give most of the saving at no cost. This also makes `display: optional` bite less often — a smaller
+file lands inside the block period more of the time, so the first-visit fallback is rarer.
 
 Two characters the site uses are in neither font file: `→` (U+2192), in the footer's `draft→live`
 label, and any extended-range glyph. They render in the fallback. Cosmetic, and recorded here so it

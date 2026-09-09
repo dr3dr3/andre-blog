@@ -75,5 +75,7 @@ rounds maximum, then it goes to André regardless of unresolved objections. Brai
 
 ## Commands
 
-`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check` · `pnpm check:og` and `pnpm check:content` (both after a build — the social cards, and that no drafting scaffolding reaches a reader) · `pnpm check:reading` (the built site in a real browser at five viewports — measure, heading scale, evidence legibility, tap targets) · `pnpm lighthouse` (the deployed site, all four categories, exits non-zero under 100). `astro dev` does not work when the repo
+`pnpm dev` · `pnpm build` · `pnpm preview` · `pnpm check` · `pnpm fonts` (regenerates the served
+font files from the pristine downloads in `src/fonts`; not part of the build, run it when the
+subsetting rules change) · `pnpm check:og` and `pnpm check:content` (both after a build — the social cards, and that no drafting scaffolding reaches a reader) · `pnpm check:reading` (the built site in a real browser at five viewports — measure, heading scale, evidence legibility, tap targets) · `pnpm lighthouse` (the deployed site, all four categories, exits non-zero under 100). `astro dev` does not work when the repo
 sits on a Windows drive — see "Local development" in the [README](README.md).
