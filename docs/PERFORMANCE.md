@@ -23,13 +23,15 @@ Run with `pnpm lighthouse` against production, Lighthouse 13.4.1. It covers ever
 2026-09-08 batch: the About fix, the prose type scale, the measure step, heading semantics, read
 next, the outcome glossary and the rule 6 reframe.
 
-| Metric | Mobile (2 runs) | Desktop |
+Measured 2026-09-09, three consecutive warm runs, identical to the digit.
+
+| Metric | Mobile | Desktop |
 | --- | --- | --- |
-| First Contentful Paint | 0.8–1.2s | 0.2s |
+| First Contentful Paint | 0.8s | 0.2s |
 | Largest Contentful Paint | 1.2–1.7s | 0.3s |
-| Total Blocking Time | 0–20ms | 0ms |
-| Cumulative Layout Shift | 0.028–0.048 | 0.006 |
-| Speed Index | 1.4–2.5s | 0.4s |
+| Total Blocking Time | 0ms | 0ms |
+| Cumulative Layout Shift | 0.028 | 0.006 |
+| Speed Index | 1.0s | 0.4s |
 
 **Ranges, not values, because a single run from here is noisy.** Two mobile runs fifteen minutes
 apart, against the same unchanged deployment, differed by 1.1s on Speed Index — most of a second on
@@ -39,6 +41,12 @@ That is the operational fact worth carrying: **one run is not a measurement.** B
 change regressed something, run it again. Before concluding a change fixed something, run it again.
 A difference smaller than the spread above is noise, and the 2.8s Speed Index regression that the
 paper grain caused was only trustworthy because it was several times larger than this.
+
+**Discard the first run after a deploy.** On 2026-09-09 the run taken immediately after a deploy
+landed reported Cumulative Layout Shift at 0.068 and put Performance under 100 — the gate fired. The
+next three runs, against the same unchanged deployment, each reported 0.028 and 100, identically. The
+first request after a deploy pays for a cold edge cache and does not represent what a reader gets.
+Wait, or run it twice and keep the second.
 
 **These are not comparable to the PageSpeed numbers recorded before them.** `pnpm lighthouse` runs
 from the dev container over its own network to Vercel; PageSpeed runs from Google's infrastructure.
