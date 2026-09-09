@@ -70,6 +70,37 @@ const chrome = await launch({
     chromeFlags: ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
 });
 
+/*
+ * Kill the browser exactly once, from wherever the script leaves.
+ *
+ * This used to be a `finally` with `process.exit()` inside the `try` above it,
+ * which is the bug that leaked 90 orphaned Chromium roots — 360 processes and
+ * 22.8GB of resident memory — into this devcontainer over a day.
+ * `process.exit()` terminates the process synchronously and a pending `finally`
+ * never runs, so `chrome.kill()` was skipped on *every* invocation, not only
+ * the failing ones. The browsers were reparented to init and sat there.
+ *
+ * A signal handler covers the other half: Ctrl-C on a slow run left a browser
+ * behind for the same reason.
+ */
+let killed = false;
+const kill = () => {
+    if (killed) return;
+    killed = true;
+    try {
+        chrome.kill();
+    } catch {
+        // Already gone. Nothing to do, and never worth failing a run over.
+    }
+};
+process.on('exit', kill);
+for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
+    process.on(signal, () => {
+        kill();
+        process.exit(130);
+    });
+}
+
 try {
     const result = await lighthouse(
         url,
@@ -120,7 +151,10 @@ try {
             ? '\n100 across the board. Budget held.\n'
             : `\n${failed} categor${failed === 1 ? 'y is' : 'ies are'} below 100. See docs/PERFORMANCE.md.\n`,
     );
-    process.exit(failed === 0 ? 0 : 1);
+    // `kill` also runs on 'exit', so the browser is gone either way. Setting
+    // the code rather than calling process.exit() keeps the handler's contract
+    // simple: one exit path, one kill.
+    process.exitCode = failed === 0 ? 0 : 1;
 } finally {
-    chrome.kill();
+    kill();
 }
