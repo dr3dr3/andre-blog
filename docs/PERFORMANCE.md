@@ -64,16 +64,33 @@ read comfortably. On 2026-09-08 it did exactly that: a section heading was rende
 paragraph it headed, and the measure ran to 89 characters on every laptop. Both cost zero Lighthouse
 points. Both had been shipping for weeks.
 
-These bind at every width, not only the one the layout was composed for.
+These bind at every width, not only the one the layout was composed for, and **`pnpm check:reading`
+enforces them** — in a real browser at five viewports, because font metrics, line boxes and hit areas
+are not derivable from a stylesheet. The character count of a line depends on the glyphs in it.
 
-| Condition | Where it is set |
+| Condition | Measured as |
 | --- | --- |
-| The measure stays inside 45–75 characters | `--measure`, stepped at `40rem` |
-| A section heading is never smaller than the body it heads | `--fs-h2` ≥ 1.15× `--fs-body` |
-| Evidence is never the smallest text on the page | `--fs-artefact` |
-| Anything a reader acts on clears a 44px target | index titles, nav |
-| Every listing exposes headings | `PostEntry` renders `h2` |
-| Every state a screen reader gets is visible too | `aria-current` has a visible style |
+| The measure stays inside 45–80 characters | real line boxes, averaged over the prose |
+| A section heading is never smaller than the body it heads | `--fs-h2` and `--fs-index-title` ≥ 1.15× `--fs-body` |
+| Evidence is never the smallest text on the page | `--fs-artefact` against `--fs-body`, and against every rendered element |
+| Evidence is never clipped | `scrollWidth > clientWidth` on the artefact |
+| Anything a reader acts on clears a 44px target | bounding boxes at ≤768px |
+| Every listing exposes headings | `h2` count on a page carrying `.post-index` |
+
+Two notes on how it decides, because both were wrong on the first attempt:
+
+- **The 45-character minimum only applies where the measure is what binds.** On a 390px phone the
+  column is the viewport, and no type size reaches 45 characters there — every mobile site sits
+  around 40. The check compares the column against the available width and skips the minimum when
+  the viewport is deciding.
+- **It asserts on tokens, not only on rendered elements.** No published post carries a `##` heading,
+  so an element-only check for "h2 against body" had nothing to measure and passed vacuously. A
+  check that cannot fail is not a check.
+
+Written as prose on 2026-09-08 and broken the same day: raising `--fs-artefact` from 13px to 18px so
+the evidence would stop being the smallest text pushed half of every long line outside the block.
+The arithmetic was in the tokens the whole time and nothing measured it. That is why these are
+executable now.
 
 ## How to measure
 

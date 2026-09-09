@@ -1090,3 +1090,19 @@ h1 {
 .meta-help:focus-visible {
     text-decoration-color: var(--info);
 }
+
+/* ---------------------------------------------------------------------------
+ * Touch targets.
+ *
+ * The nav and the post tags were 20px tall — the height of their own text and
+ * nothing more — on the viewport where nearly every reader arrives. Padded past
+ * the line box with a cancelling negative margin, so the hit area clears 44px
+ * and no layout moves. The same treatment the index title already carries.
+ * ------------------------------------------------------------------------ */
+
+.site-header nav a,
+.post-tags a {
+    display: inline-block;
+    padding-block: 0.75rem;
+    margin-block: -0.75rem;
+}
